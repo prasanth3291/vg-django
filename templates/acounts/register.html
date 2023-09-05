@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+  
+
+<section class="section-content padding-y">
+
+    <!-- ============================ COMPONENT REGISTER   ================================= -->
+        <div class="card mx-auto" style="max-width:520px; margin-top:40px;">
+          <article class="card-body">
+            {% include 'includes/alerts.html' %}
+            <header class="mb-4"><h4 class="card-title">Sign up</h4></header>
+            <form  action="{% url 'register' %}" method="POST">
+                {% csrf_token %}
+                    <div class="form-row">
+                        <div class="col form-group">
+                            <label>First name</label>
+                             {{form.first_name}}
+                        </div> <!-- form-group end.// -->
+                        <div class="col form-group">
+                            <label>Last name</label>
+                              {{form.last_name}}
+                        </div> <!-- form-group end.// -->
+                    </div> <!-- form-row end.// -->
+                    <div class="form-group">
+                        <label>{{form.email}}</label>
+                        
+                        <small class="form-text text-muted">We'll never share your email with anyone else.</small>
+                    </div> <!-- form-group end.// -->
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Phone Number</label>
+                            {{form.phone_number}}
+                        </div> <!-- form-group end.// --> 
+                  
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Create password</label>
+                            {{form.password}}
+                        </div> <!-- form-group end.// --> 
+                        <div class="form-group col-md-6">
+                            <label>confirm password</label>
+                            {{form.confirm_password}}
+                        </div> <!-- form-group end.// -->  
+                    
+                    <div class="form-group col-md-12">
+                        <button type="submit" class="btn btn-primary btn-block"> Register  </button>
+                    </div> <!-- form-group// -->      
+                        
+                </form>
+                {{ form.email.errors}}
+                {{form.non_field_errors}}
+                
+            </article><!-- card-body.// -->
+        </div> <!-- card .// -->
+        <p class="text-center mt-4">Have an account? <a href="{% url 'login' %}">Log In</a></p>
+        <br><br>
+        <div class="form-hroup">
+            <h6 style="text-align: center;">OR Sign Up using</h6>
+            <div class="social" style="justify-content: center;padding: 10px; align-items: center;display: flex;">
+                <div class="fb">
+                    <img src="https://t1.gstatic.com/images?q=tbn:ANd9GcQx0KBDkQEPaJZKalrnaNR6j6s7M_ZI_24-9jcveNNs8xWNMum7"
+                    style="padding: 5px;height: 40px;" alt="">
+
+                </div>
+                <div class="google">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/2008px-Google_%22G%22_Logo.svg.png"
+                    style="padding: 5px;height: 40px;" alt="">
+                    
+
+                </div>
+                <div class="twtr">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Logo_of_Twitter.svg/512px-Logo_of_Twitter.svg.png?20220821125553"
+                    style="padding: 5px;height: 40px;" alt="">
+
+                </div>
+            </div>
+        </div>
+
+        <p class="text-center mt-4">Have an account? <a href="signin">Log In</a></p>
+
+        
+
+    <!-- ============================ COMPONENT REGISTER  END.// ================================= -->
+    
+    
+    </section>
+    
+{% endblock %}

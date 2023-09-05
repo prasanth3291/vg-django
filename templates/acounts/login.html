@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+
+<section class="section-content padding-y " >
+    {% if request.GET.command == 'verification' %}
+
+<div class="container mx-auto alert alert-info" style="text-align: center;height:60% ; max-width:720px; margin-top:50px;">
+
+  Thank you for regestering with us,we have sent an verification link to your Email adress {{request.GET.email}}.Please verify it..
+
+</div>
+
+{% else %}
+
+    <!-- ============================ COMPONENT REGISTER   ================================= -->
+    
+    <div class="centre" style= "justify-content: center; display: flex;">	
+        <div class="card mx-auto" style= "background-color: rgb(232, 245, 240); width: 30%;"  >
+            <article class="card-body">
+              
+              <div style="padding: 25px; background-color: rgb(232, 245, 240);">
+                <h1 style="font-size: 60px;">
+                    Discover And Find Your Own Fashions
+                </h1>
+                <h4 style="padding-top: 50px;">
+                    Where Style Meets Elegance Unleash Your Fashion Dreams At Vogue Villa
+                </h4>
+              </div>
+    
+            
+              
+              </article><!-- card-body.// -->
+          </div> <!-- card .// -->
+      
+    
+    <!-- ============================ COMPONENT LOGIN   ================================= -->
+        
+
+
+    <div class="card mx-auto" style="height:60% ; width: 30%; margin-top:50px;">
+        <div class="card-body">
+            {% include 'includes/alerts.html' %}
+        <h4 class="card-title mb-4">Sign in</h4>
+        <form action="{% url 'login' %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+               <input type="email" class="form-control" placeholder="Email Address" name="email" >
+            </div> <!-- form-group// -->
+            <div class="form-group">
+              <input type="password" class="form-control" placeholder="Password" name="password" >
+            </div> <!-- form-group// -->
+            
+            <div class="form-group" style="text-align: center;">
+                <a href="#" class="mx-auto">Forgot password?</a> 
+             
+            </div> <!-- form-group form-check .// -->
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block"> Login  </button>
+            </div> <!-- form-group// -->    
+            <p class="text-center mt-4">Don't have account? <a href="{% url 'register' %}">Sign up</a></p>
+        </form>
+        </div> <!-- card-body.// -->
+      </div> <!-- card .// -->
+    
+       
+       <br><br>
+    </div>	
+        
+      
+    {% endif %}
+        
+        <br><br>
+    <!-- ============================ COMPONENT REGISTER  END.// ================================= -->
+    
+    
+    </section>
+
+
+{% endblock %}
