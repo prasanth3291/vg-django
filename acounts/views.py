@@ -58,7 +58,7 @@ def register(request):
             #new
             otp=generate_random_otp()
             account_sid = "ACd61c3ec36ca81a50af865490b6342a4a"
-            auth_token = "985ad94378d81bb3d5aed57fca172b79"
+            auth_token = "0c51f34d87835e2d5bf8f552ce5d9b89"
             client = Client(account_sid, auth_token)
             message = client.messages \
                 .create(
@@ -93,7 +93,7 @@ def login(request):
     if request.user.is_authenticated:
         user=request.user
         if user.is_superadmin:
-                return render(request,'admin/dashboard.html')
+                return render(request,'admins/dashboard.html')
         else:
             
             return redirect ('home')
@@ -108,7 +108,7 @@ def login(request):
             auth.login(request,user)
             
             if user.is_superadmin:
-                return render(request,'admin/dashboard.html')
+                return render(request,'admins/dashboard.html')
             else:
             
                 return redirect ('home')
@@ -142,5 +142,11 @@ def activate(request,uidb64,token):
     else:
         messages.error(request,'Invalid link')
         return redirect ('register')
+    
+    
+def user_dashboard(request):
+    pass    
 
 # Create your views here.
+
+

@@ -1,4 +1,4 @@
-{% extends 'admin/base.html' %}
+{% extends 'admins/base.html' %}
 
 {% block content %}
 
@@ -19,14 +19,12 @@
       
                     
                     <th>Email</th>
-                    <th>First Name</th>
-            
+                    <th>First Name</th>            
                     <th>User Name</th>
-                    <th>Last login</th>                  
-                    
+                    <th>Last login</th>                
                     <th>Date joined</th>
                     <th>Is active</th>
-                    <th>Delete User</th>
+                    
                 </tr>
             </thead>
             {% for customer in customers %}
@@ -52,9 +50,8 @@
                         </form>
                       
                     </td>
-                    <td><a href="#deleteEmployeeModal-{{forloop.counter}}" class="delete btn btn-danger" data-toggle="modal">delete</a></td>
                     {% else %}
-                    <td></td>
+                    
                     <td></td>
                     {% endif %}  
                 </tr>    

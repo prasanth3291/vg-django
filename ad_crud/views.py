@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.shortcuts import HttpResponse,get_object_or_404
 from acounts.models import Acount
-from store.models import Product
+from store.models import Product,softdelete,NonDeleted
 from category.models import category
 from.form import ProductForm
 from django.db.models import Q
@@ -15,7 +15,7 @@ def ad_dashboard(request):
     }
     
   
-    return render(request,'admin/dashboard.html',context)
+    return render(request,'admins/dashboard.html',context)
 
 
 def customers(request):
@@ -23,7 +23,7 @@ def customers(request):
     context={
         'customers':customers        
     }   
-    return render(request,'admin/customers.html',context)
+    return render(request,'admins/customers.html',context)
 
 def block_unblock_user(request,user_id):   
     user = get_object_or_404(Acount, id=user_id)
@@ -52,7 +52,7 @@ def ad_products(request):
         'products':products,
         'categories':categories
     }    
-    return render(request,'admin/products.html',context)  
+    return render(request,'admins/products.html',context)  
 
 def add_products(request):
     
@@ -124,7 +124,7 @@ def edit_products(request,product_id):
 def delete_products(request,product_id):
     try:
         product=Product.objects.get(id=product_id)
-        product.delete()
+        product.SoftDelete()
         return redirect('ad_products')
     except Product.DoesNotExist:
         return redirect('ad_products')
@@ -135,7 +135,7 @@ def ad_category(request):
     context={
         'categories':categories
     }
-    return render(request,'admin/category.html',context)    
+    return render(request,'admins/category.html',context)    
 def add_category(request):
     
     if request.method == 'POST':

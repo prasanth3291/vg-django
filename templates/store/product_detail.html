@@ -13,59 +13,56 @@
             <aside class="col-md-6">
     <article class="gallery-wrap"> 
         <div class="img-big-wrap">
-           <a href="#"><img src="{{single_product.images.url}}"></a>
+          <a href="#">
+            <img src="{{single_product.images.url}}" id="product-image" style="max-width: 100%;"
+            onmousemove="zoomImage(event)" onmouseout="resetZoom()">
+            <div id="zoomed-image-container"
+                                style="scale:1.2;position: absolute; top: 0; left: 100%; width: 400px; height: 450px; border: 2px solid #ccc; display: none; z-index:10"></div>
+        </a>
+        
         </div> <!-- img-big-wrap.// -->
+        
+
+        
         
     </article> <!-- gallery-wrap .end// -->
             </aside>
             <main class="col-md-6 border-left">
     <article class="content-body">
+      <form action="{% url 'add_cart' single_product.id %}" method="POST">
+
+        {% csrf_token %}
     
-    <h2 class="title">{{p}}</h2>
+    <h2 class="title">{{single_product.product_name}}</h2>
     
     <div class="mb-3"> 
-        <var class="price h4">{{single_product.price}}</var> 
+        <var class="price h4">$ {{single_product.price}}</var> 
     </div> 
     
     <p>{{single_product.description}}</p>
     
     <hr>
         <div class="row">
-            <div class="item-option-select">
+            <div class="item-option-select" style="position: relative; z-index:2">
                 <h6>Choose Color</h6>
-                <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
-                  <label class="btn btn-light">
-                    <input type="radio" name="radio_color"> Silver
-                  </label>
-                  <label class="btn btn-light">
-                    <input type="radio" name="radio_color" > Gray
-                  </label>
-                  <label class="btn btn-light active">
-                    <input type="radio" name="radio_color checked"> Gold
-                  </label>
-                  <label class="btn btn-light">
-                    <input type="radio" name="radio_color"> Black
-                  </label>
-                </div> 
+              <select name="color" class="form-control"  required>
+                <option value="" disabled selected>Choose color</option>
+                {% for i in single_product.variation_set.colors %}
+                <option value="{{i.variation_value}}">{{i.variation_value}}</option>
+                {% endfor %}
+              </select>
             </div>
         </div> <!-- row.// -->
         <div class="row">
             <div class="item-option-select">
                 <h6>Select Size</h6>
-                <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
-                  <label class="btn btn-light">
-                    <input type="radio" name="radio_color"> S
-                  </label>
-                  <label class="btn btn-light active">
-                    <input type="radio" name="radio_color" checked> M
-                  </label>
-                  <label class="btn btn-light">
-                    <input type="radio" name="radio_color"> L
-                  </label>
-                  <label class="btn btn-light">
-                    <input type="radio" name="radio_color"> XL
-                  </label>
-                </div> 
+                <select name="size" class="form-control" required >
+                    <option value="" disabled selected>Choose size</option>
+                    {% for i in single_product.variation_set.sizes %}
+                    <option value="{{i.variation_value}}">{{i.variation_value}}</option>
+                    {% endfor %}
+                </select>
+                
             </div>
         </div> <!-- row.// -->
         <hr>
@@ -75,6 +72,8 @@
         <h4 class="oos" style="color:red">Out of stock</h4>
 
         {% else %}
+
+        
         <div class="same" style="justify-content: left; display: flex;">
             <div class="input-group input-spinner" style="padding-right: 5px;">
                 <div class="input-group-prepend">
@@ -82,17 +81,22 @@
                 </div>
                 <input type="text" class="form-control"  value="1">
                 <div class="input-group-append">
+                    
                 <button class="btn btn-light" type="button" id="button-minus"> <i class="fa fa-plus"></i> </button>
                 </div>
             </div> <!-- input-group.// -->
 
           
     
-        <div style="padding-right: 5px;"><a href="./product-detail.html" class="btn  btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
+        <div style="padding-right: 5px;">
+          <button type="submit" class="btn  btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i></button>
         </div>
         
-            <a href="./product-detail.html" class="btn  btn-primary"> <span class="text"></span> <i class="fa fa-heart" aria-hidden="true"></i>  </a>
+        <a href="./product-detail.html" class="btn  btn-primary"> <span class="text"></span> <i class="fa fa-heart" aria-hidden="true"></i>  </a>
     </div>
+  </form>
+
+    
     {% endif %}
     </article> <!-- product-info-aside .// -->
             </main> <!-- col.// -->
@@ -134,9 +138,35 @@
     </div> <!-- row.// -->
     
     
-    </div> <!-- container .//  -->
+
     </section>
     <!-- ========================= SECTION CONTENT END// ========================= -->
-    
-
+    <script>
+      // JavaScript for zoom effect
+      function zoomImage(event) {
+          const productImage = document.getElementById("product-image");
+          const zoomedImageContainer = document.getElementById("zoomed-image-container");
+  
+          // Calculate the position of the cursor within the original image
+          const x = event.offsetX / productImage.clientWidth;
+          const y = event.offsetY / productImage.clientHeight;
+  
+          // Calculate the background position for the zoomed container
+          const bgX = (x * 100) + "%";
+          const bgY = (y * 100) + "%";
+  
+          // Set the background position and show the zoomed container
+          zoomedImageContainer.style.backgroundImage = `url('{{single_product.images.url}}')`;
+          zoomedImageContainer.style.backgroundPosition = `${bgX} ${bgY}`;
+          zoomedImageContainer.style.display = "block";
+      }
+  
+      function resetZoom() {
+          const zoomedImageContainer = document.getElementById("zoomed-image-container");
+  
+          // Hide the zoomed container on mouseout
+          zoomedImageContainer.style.display = "none";
+      }
+  </script>
+  
 {% endblock %}

@@ -1,11 +1,14 @@
 from django.db import models
 from django.urls import reverse
+from softdelete.models import SoftDeleteQuerySet,SoftDeleteManager
 
 class category(models.Model):
     category_name=models.CharField( max_length=50,unique=True)
     slug=models.SlugField(max_length=100,unique=True)
     description=models.TextField(blank=True)
     cat_image=models.ImageField(upload_to='pics/categories',blank=True)
+    
+ 
     
     class Meta:
         verbose_name='category'
