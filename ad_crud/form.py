@@ -6,7 +6,7 @@ from django import forms
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['product_name', 'slug', 'description', 'price', 'stock', 'is_available', 'category', 'images']
+        fields = ['product_name', 'slug', 'description',  'is_available', 'category', 'images']# revode- 'price', 'stock',
 
     def clean_product_name(self):
         product_name = self.cleaned_data['product_name']

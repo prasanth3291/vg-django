@@ -7,9 +7,9 @@ class category(models.Model):
     slug=models.SlugField(max_length=100,unique=True)
     description=models.TextField(blank=True)
     cat_image=models.ImageField(upload_to='pics/categories',blank=True)
-    
+# add a sub category model
+
  
-    
     class Meta:
         verbose_name='category'
         verbose_name_plural='categories'
@@ -20,5 +20,12 @@ class category(models.Model):
     def __str__(self):
         return self.category_name
     
+class Sub_category(models.Model):
+    sub_cat_name=models.CharField( max_length=50,unique=True)
+    slug=models.SlugField(max_length=100,unique=True)
+    categories = models.ManyToManyField(category,blank=True)    
+    
+    def __str__(self):
+        return self.sub_cat_name 
 
 # Create your models here.

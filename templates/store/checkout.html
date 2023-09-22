@@ -4,144 +4,209 @@
 <section class="section-content padding-y bg">
     <div class="container">
 
-        
-    <!-- ============================ COMPONENT 1 ================================= -->
-    
-    <div class="row">
-        <aside class="col-lg-6">
-    <div class="card">
-        <div class="card-body">
-            <h4 class="card-title mb-4">Billing adress</h4>
-                <form action="" method="POST">
-                    {% csrf_token %}
-                    <div class="form-row">
-                        <div class="col form-group">
-                            <label for="">First name</label>
-                            <input type="text" name="first_name" class="form-control" required>
-                        </div>
-                        <div class="col form-group">
-                            <label for="">Last name</label>
-                            <input type="text" name="last_name" class="form-control" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                            <div class="col form-group">
-                                <label for="">Email</label>
-                                <input type="email" name="email" class="form-control" required>
-                            </div>
-                            <div class="col form-group">
-                                <label for="">Phone number</label>
-                                <input type="text" name="phone_number" class="form-control" required>
-                            </div>
-                    </div>        
-                    <div class="form-row">
-                            <div class="col form-group">
-                                <label for="">Adress line 1</label>
-                                <input type="text" name="adress_line1" class="form-control" required>
-                            </div>
-                            <div class="col form-group">
-                                <label for="">Adress line 2</label>
-                                <input type="text" name="adress_line2" class="form-control" >
-                            </div>
-                    </div>
+        <!-- ============================ COMPONENT 1 ================================= -->
 
-                    <div class="form-row">
-                            <div class="col form-group">
-                                <label for="">City</label>
-                                <input type="text" name="city" class="form-control" required>
-                            </div>
-                            <div class="col form-group">
-                                <label for="">State</label>
-                                <input type="text" name="state" class="form-control" required >
-                            </div>
-                    
-                            <div class="col form-group">
-                                <label for="">Country</label>
-                                <input type="text" name="country" class="form-control" required>
-                            </div>
-                    </div>
-
-                    <div class="form-row">
-                        <label for="">Order note</label>
-                        <textarea name="order_note" id="" class="form-control"  rows="2"></textarea>
-                    </div>
+        <div class="row">
+            <aside class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Billing Address</h4>
+                        <form action="{% url 'place_order' %}" method="POST" id="addressForm">
+                            {% csrf_token %}
                             
-                 
-            </div>
+                            <!-- Radio buttons for selecting either saved or new address -->
+                           
+                            <div class="form-check">
+                                {% for address in saved_addresses %}
+                                <input type="radio" class="form-check-input" name="selected_address" value="{{ address.id }}" id="address{{ address.id }}">
+                                <label class="form-check-label" for="address{{ address.id }}">
+                                    {{ address.name }} <br> {{ address.address_line1 }} <br> {{ address.city }}
+                                    <br> {{ address.state }} <br> {{ address.country }} <br> {{ address.pin }}
+                                </label><br>
+                                <hr>
+                                {% endfor %}
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" name="selected_address" value="new" id="newAddress">
+                                <label class="form-check-label" for="newAddress">Add a new Address</label>
+                            </div>
 
-    </div> <!-- card.// -->
-    
-        </aside> <!-- col.// -->
-        <aside class="col-lg-6">
-    
-            <div class="card">
-            <div class="card-body">
-                <table class="table table-borderless table-shopping-cart">
-                    <thead class="text-muted">
-                    <tr class="small text-uppercase">
-                        
-                      <th scope="col">Product</th>
-                      <th scope="col" width="120">Quantity</th>
-                      <th scope="col" width="120">Price</th>
-                      <th scope="col" class="text-right" width="200"> </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        {% for cart_item in cart_items %}
-                    <tr>
-                        <td>
-                            <figure class="itemside align-items-center">
-                                <div class="aside"><img src="{{cart_item.product.images.url}}" class="img-sm"></div>
-                                <figcaption class="info">
-                                    <a href="{{cart_item.product.get_url }}" class="title text-dark">{{cart_item.product.product_name}}</a>
-                                    <p class="text-muted small">
-                                        {% if cart_item.variations.all %}
-                
-                                        {% for item in cart_item.variations.all %}
-                
-                
-                                        
-                                        {{item.variation_category | capfirst}} :  {{item.variation_value | capfirst}} <br>
-                
-                                        {% endfor %}
-                                        {% endif %}
-                                    </p>
-                                </figcaption>
-                            </figure>
-                        </td>
-                        <td> 
-                            <label for="">{{cart_item.quantity}}</label>
+                            <!-- Include the form fields for a new address -->
+                            <div id="newAddressForm" style="display: none;">
+                                <div class="form-row">
+                                    <div class="col form-group">
+                                        <label for="">First name</label>
+                                        <input type="text" name="first_name" class="form-control">
+                                    </div>
+                                    <!-- Add the rest of the new address form fields here -->
+                                    <div class="col form-group">
+                                        <label for="">Last name</label>
+                                        <input type="text" name="last_name" class="form-control">
+                                    </div>
+                                </div>
+                                    <div class="form-row">
+                                        <div class="col form-group">
+                                            <label for="">Email</label>
+                                            <input type="email" name="email" class="form-control" >
+                                        </div>
+                                        <div class="col form-group">
+                                            <label for="">Phone number</label>
+                                            <input type="text" name="phone_number" class="form-control" >
+                                        </div>
+                                           
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="col form-group">
+                                            <label for="">Address line 1</label>
+                                            <input type="text" name="adress_line1" class="form-control">
+                                        </div>
+                                        <div class="col form-group">
+                                            <label for="">Address line 2</label>
+                                            <input type="text" name="adress_line2" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="col form-group">
+                                            <label for="">City</label>
+                                            <input type="text" name="city" class="form-control" >
+                                        </div>
+                                        <div class="col form-group">
+                                            <label for="">State</label>
+                                            <input type="text" name="state" class="form-control" >
+                                        </div>
+                                        <div class="col form-group">
+                                            <label for="">Country</label>
+                                            <input type="text" name="country" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <label for="">Order note</label>
+                                        <textarea name="order_note" id="" class="form-control" rows="2"></textarea>
+                                        <div class="col form-group">
+                                            <label for="">Pin</label>
+                                            <input type="text" name="pin" class="form-control" >
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                </div>
+                                <!-- ... (other form fields for a new address) ... -->
+                            </div>
 
-                        </td>
-                        <td> 
-                            <div class="price-wrap"> 
-                                <var class="price">$ {{cart_item.sub_total}}</var> 
-                                <small class="text-muted">$ {{cart_item.product.price}} each </small> 
-                            </div> <!-- price-wrap .// -->
-                        </td>
-                        
-                    </tr>
-                    {% endfor %}
-                   
-                    </tbody>
-                    </table>
-                
-                
-                <button type="submit"  class="btn btn-primary btn-block">Place order</button>
-                <a href="./store.html" class="btn btn-light btn-block">Continue Shopping</a>
-            </form>
-            </div> <!-- card-body.// -->
-            </div> <!-- card.// -->
+                            <!-- Button for Place Order -->
+                            <button type="submit" class="btn btn-primary btn-block mt-4">Place Order</button>
+                        </form>
+                    </div> <!-- card-body.// -->
             
-    
-    </aside> <!-- col.// -->
-    
-    
-    </div> <!-- row.// -->
-    <!-- ============================ COMPONENT 1 END .// ================================= -->
-
-    
+                
+            </aside> <!-- col.// -->
+            <aside class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-borderless table-shopping-cart">
+                            <thead class="text-muted">
+                            <tr class="small text-uppercase">
+                                
+                              <th scope="col">Product</th>
+                              <th scope="col" width="120">Quantity</th>
+                              <th scope="col" width="120">Price</th>
+                              <th scope="col" class="text-right" width="200"> </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for cart_item in cart_items %}
+                            <tr>
+                                <td>
+                                    <figure class="itemside align-items-center">
+                                        <div class="aside"><img src="{{cart_item.product.images.url}}" class="img-sm"></div>
+                                        <figcaption class="info">
+                                            <a href="{{cart_item.product.get_url }}" class="title text-dark">{{cart_item.product.product_name}}</a>
+                                            <p class="text-muted small">
+                                                Color:{{cart_item.variations.color}}
+                        
+                                            </p>
+                                            <p class="text-muted small">
+                                                Size :{{cart_item.variations.size}}
+                                                
+                                            </p>
+                                        </figcaption>
+                                    </figure>
+                                </td>
+                                <td> 
+                                    <!-- col.// -->
+                                                <div class="col"> 
+                                                    <div class="input-group input-spinner">
+                                                        <div class="input-group-prepend">
+                                                        <a href="{% url 'remove_cart' cart_item.product.id cart_item.id %}" class="btn btn-light" type="button" id="button-minus"> <i class="fa fa-minus"></i></a>     
+                                                        </div>
+                                                        <input type="text" class="form-control"  value="{{cart_item.quantity}}">
+                                                        <div class="input-group-append">
+                                                            <form action="{% url 'add_cart' cart_item.product.id %}" method="POST">
+                                                                {% csrf_token %}
+                        
+                                                                
+                                                                <input type="hidden" name="color" value="{{cart_item.variations.color}}">
+                                                                <input type="hidden" name="size" value="{{cart_item.variations.size}}">
+                                                                
+                                                        <button class="btn btn-light" type="submit" id="button-plus"> <i class="fa fa-plus"></i></button>
+                                                            </form>
+                                                        </div>
+                                                    </div> <!-- input-group.// -->
+                                                </div> <!-- col.// -->
+                                </td>
+                                <td> 
+                                    <div class="price-wrap"> 
+                                        <var class="price">$ {{cart_item.sub_total}}</var> 
+                                        <small class="text-muted">$ {{cart_item.product.price}} each </small> 
+                                    </div> <!-- price-wrap .// -->
+                                </td>
+                                
+                            </tr>
+                            {% endfor %}
+                           
+                            </tbody>
+                            </table>
+                    </div> <!-- card-body.// -->
+                </div> <!-- card.// -->
+            </aside> <!-- col.// -->
+        </div>
     </div> <!-- container .//  -->
-    </section>
+</section>
 
+<!-- JavaScript to show/hide the new address form and modify "required" attribute -->
+<!-- JavaScript to show/hide the new address form and handle form submission -->
+<script>
+    const savedAddressRadios = document.querySelectorAll('input[name="selected_address"]');
+    const newAddressForm = document.getElementById('newAddressForm');
+    const addressForm = document.getElementById('addressForm');
+    const newFirstNameField = document.getElementById('newFirstName'); // Adjust the ID accordingly for other fields
+  
+    savedAddressRadios.forEach(function (radio) {
+      radio.addEventListener('change', function () {
+        if (radio.value === 'new') {
+          newAddressForm.style.display = 'block';
+        } else {
+          newAddressForm.style.display = 'none';
+        }
+      });
+    });
+  
+    // Add an event listener to the form to handle submission
+    addressForm.addEventListener('submit', function (event) {
+      // Perform your custom validation logic here
+      if (document.querySelector('input[name="selected_address"]:checked').value === 'new') {
+        // Check if the new address fields are empty
+        if (newFirstNameField.value.trim() === '') {
+          // You can add more validation checks for other fields as needed
+          alert('Please fill out all required fields for the new address.');
+          event.preventDefault(); // Prevent the form from submitting
+        }
+      }
+      // You can add more custom validation checks for other scenarios here
+    });
+  </script>
+  
+  
+  
+  
 {% endblock %}

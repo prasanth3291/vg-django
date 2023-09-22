@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Make sure to include Bootstrap CSS and JavaScript -->
+<!-- Also, include Font Awesome CSS for the icon -->
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten padding-y bg">
+    <div class="container">
+        {% include 'includes/alerts.html' %}
+        <div class="row">
+            {% include 'includes/dashboard_sidebar.html' %}
+        <main class="col-md-7">
+            <div class="card-header">
+                <h6>Billing adress</h6>
+              </div>
+            {% for adress in adresses %}
+            <div class="card text mb-2">           
+                
+                <div class="h" style="display: flex;">               
+                 <div class="card-body">                
+                  <p class="card-text mb-0">{{adress.name}}</p>
+                  <hr class="mb-0 mt-0">
+                  <p class="card-text mb-0">{{adress.adress_line1}}</p>
+                  <hr class="mb-0 mt-0">
+                  <p class="card-text mb-0">{{adress.adress_line2}}</p>
+                  <hr class="mb-0 mt-0">
+                  <p class="card-text mb-0">{{adress.city}}</p>
+                  <hr class="mb-0 mt-0">
+                  <p class="card-text mb-0">{{adress.state}}</p>
+                  <hr class="mb-0 mt-0">
+                  <p class="card-text mb-0">{{adress.country}}</p> 
+                  <hr class="mb-0 mt-0"> 
+                  <p class="card-text mb-0">{{adress.pin}}</p> 
+                  <hr class="mb-0 mt-0"> 
+                  <p class="card-text mb-0">{{adress.phone_number}}</p>  
+                  <hr>   
+                </div>
+                <div class="dropdown">
+                    <button type="button" class="btn btn dropdown-toggle" data-toggle="dropdown"> 
+                        <i class="fa fa-bars"></i>  
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="{% url 'edit_adress' adress.id %}">Edit</a>
+                        
+                        
+                        <a class="dropdown-item" href="{% url 'delete_adress' adress.id %}">Delete</a>
+                        
+                        
+                        
+                    </div>
+                  </div>
+                 
+                </div>
+                
+            </div>
+            {% endfor %}
+            <article class="card">
+            <header class="card-header">
+                <strong class="d-inline-block mr-3">Add adress</strong>
+                
+            </header>
+            <div class="card-body">
+                
+                
+                <div class="row"> 
+                    
+                    
+                    <div class="col md-12">
+                        <form action="{% url 'add_adress' %}" method="POST" >
+                            {% csrf_token %}
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label >Name</label>
+                                    <input type="text" name="name" class="form-control">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label >Phone number</label>
+                                    <input type="text" name="phone_number" class="form-control">                                    
+                                </div>
+                            </div>
+                           
+                            <div class="form-group">
+                                <label >Adress line 1</label>
+                                <input type="text" name="adress_line1" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label >Adress line 2</label>
+                                <input type="text" name="adress_line2" class="form-control">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label >City</label>
+                                    <input type="text" name="city" class="form-control">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label >State</label>
+                                    <input type="text" name="state" class="form-control">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label >Country</label>
+                                    <input type="text" name="country" class="form-control">
+                                </div>
+                            </div>
+                                
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label >Email</label>
+                                    <input type="email" name="email" class="form-control">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label >Pincode</label>
+                                    <input type="text" name="pin" class="form-control">
+                                </div>
+                            </div>
+                            
+                            <input type="submit" value="Save" class="btn btn-primary">
+                           
+                        </form>
+                       
+                        </div>
+                    </div>
+
+                </div> <!-- row.// -->
+            </div> <!-- card-body .// -->
+         
+            </article> <!-- order-group.// --> 
+        </main>
+    </div> <!-- row.// -->
+    </div>
+    
+    
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+
+
+{% endblock %} 

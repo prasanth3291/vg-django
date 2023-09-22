@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Make sure to include Bootstrap CSS and JavaScript -->
+<!-- Also, include Font Awesome CSS for the icon -->
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten padding-y bg">
+    <div class="container">
+        {% include 'includes/alerts.html' %}
+        <div class="row">
+            {% include 'includes/dashboard_sidebar.html' %}
+        <main class="col-md-7">
+            <div class="card-header">
+                <h6>Edit adress</h6>
+              </div>
+            <article class="card">
+           
+            <div class="card-body">
+                
+                
+                <div class="row">                     
+                    
+                    <div class="col md-12">
+                        <form action="{% url 'edit_adress' adress.id %}" method="POST" >
+                            {% csrf_token %}
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label >Name</label>
+                                    {{adress_form.name}}
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label >Phone number</label>
+                                    {{adress_form.phone_number}}                                    
+                                </div>
+                            </div>
+                           
+                            <div class="form-group">
+                                <label >Adress line 1</label>
+                                {{adress_form.adress_line1}}
+                            </div>
+                            <div class="form-group">
+                                <label >Adress line 2</label>
+                                {{adress_form.adress_line2}}
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label >City</label>
+                                    {{adress_form.city}}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label >State</label>
+                                    {{adress_form.state}}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label >Country</label>
+                                    {{adress_form.country}}
+                                </div>
+                            </div>
+                                
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label >Email</label>
+                                    {{adress_form.email}}
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label >Pincode</label>
+                                    {{adress_form.pin}}
+                                </div>
+                            </div>
+                            
+                            <input type="submit" value="Save" class="btn btn-primary">
+                           
+                        </form>
+                       
+                        </div>
+                    </div>
+
+                </div> <!-- row.// -->
+            </div> <!-- card-body .// -->
+         
+            </article> <!-- order-group.// --> 
+        </main>
+    </div> <!-- row.// -->
+    </div>
+    
+    
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+
+
+{% endblock %} 

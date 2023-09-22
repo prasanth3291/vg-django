@@ -37,7 +37,7 @@
 			<a href="{{item.get_url}}" class="img-wrap"> <img src="{{item.images.url}}"> </a>
 			<figcaption class="info-wrap">
 				<a href="{{item.get_url}}" class="title">{{item.product_name}}</a>
-				<div class="price mt-1">{{item.price}}</div> <!-- price-wrap.// -->
+				<div class="price mt-1">{% with price=item.variation_set.first %} ${{price.price}} {% endwith %}</div> <!-- price-wrap.// -->
 			</figcaption>
 		</div>
 	</div> <!-- col.// -->

@@ -1,10 +1,11 @@
-from django.shortcuts import render,redirect
-from .forms import RegistrationForms
-from.models import Acount
+from django.shortcuts import render,redirect,get_object_or_404
+from .forms import RegistrationForms,UserForm,UserProfileForm,AdressForm
+from.models import Acount,UserProfile,Adress
 from django.contrib import messages,auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate,login as auth_login
 from django.shortcuts import HttpResponse
+from orders.models import Order,Payment,OrderProduct
 
 # user verification
 from django.contrib.sites.shortcuts import get_current_site
@@ -59,6 +60,7 @@ def register(request):
             to_email=email
             send_email=EmailMessage(mail_subject,message,to=[to_email])
             
+            
             #new
             otp=generate_random_otp()
             account_sid = "ACd61c3ec36ca81a50af865490b6342a4a"
@@ -100,6 +102,8 @@ def login(request):
                 return render(request,'admins/dashboard.html')
         else:
             
+       
+            
             return redirect ('user_dashboard')
     
     
@@ -117,8 +121,8 @@ def login(request):
                     #getting the product variation byt product id 
                     product_variation=[]
                     for item in cart_item:
-                        variation=item.variations.all()
-                        product_variation.append(list(variation)) 
+                        variation=item.variations
+                        product_variation.append(variation) 
                     
             # exis. variation --> from database            
             # current variations--> from product variation            
@@ -127,13 +131,13 @@ def login(request):
                     existing_variation_list=[]    
                     id=[]    
                     for item in cart_item:
-                        existing_variation=item.variations.all()
-                        existing_variation_list.append(list(existing_variation))
+                        existing_variation=item.variations
+                        existing_variation_list.append(existing_variation)
                         id.append(item.id)
                         
-                    for pr in product_variation:    
-                        if pr in existing_variation_list:
-                            indx=existing_variation_list.index(pr)
+                    for var in product_variation:    
+                        if var in existing_variation_list:
+                            indx=existing_variation_list.index(var)
                             item_id=id[indx]
                             item=CartItem.objects.get(id=item_id)
                             item.quantity += 1
@@ -153,26 +157,33 @@ def login(request):
             if user.is_superadmin:
                 return render(request,'admins/dashboard.html')
             else:
-                messages.success(request,'Successfully signed in')
+                messages.success(request,'User Successfully signed in')
                 url=request.META.get('HTTP_REFERER')
                 try:
                     query=requests.utils.urlparse(url).query
                     
-                    print('qry-->',query)
-                    # we will split qry
-                    params=dict(x.split('=') for x in query.split('&') )
-                    if 'next' in params:
-                        nextPage=params['next']
-                        print('ne',nextPage)
-                        return redirect(nextPage)
+                    if query:
+                        print('qry-->',query)
+                        # we will split qry
+                        params=dict(x.split('=') for x in query.split('&') )
+                        if 'next' in params:
+                            
+                            nextPage=params['next']
+                            print('ne',nextPage)
+                            return redirect(nextPage)
+                        else:
+                            print('here first') 
+                            return redirect ('user_dashboard')
                     else:
-                        return redirect ('user_dashboard')
+                        return redirect('user_dashboard')    
                 except:
+                    print('hai')
                     pass    
                     
         else:
             messages.error(request,'invalid login credentials')
             return redirect ('login')
+       
     return render(request,'acounts/login.html')
 
 
@@ -194,16 +205,25 @@ def activate(request,uidb64,token):
     if user is not None and default_token_generator.check_token(user,token):
         user.is_active=True
         user.save()
-        messages.success(request,'Congratulations Your Acount is activated')          
+        messages.success(request,'Congratulations Your Acount is activated')   
+        UserProfile.objects.create(user=user) 
         return redirect('login')
     
     else:
         messages.error(request,'Invalid link')
         return redirect ('register')
     
-    
+
+@login_required(login_url='login')    
 def user_dashboard(request):
-    return render(request,'acounts/user_dashboard.html')
+        orders=Order.objects.order_by('-created_at').filter(user_id=request.user.id,is_ordered=True)
+        orders_count=orders.count()
+        context={
+                'orders_count':orders_count
+            }
+            
+        print('order',orders_count)
+        return render(request,'acounts/user_dashboard.html',context)
 
 
 def forgot_password(request):   
@@ -267,9 +287,144 @@ def reset_password(request):
             return redirect('reset_password')
             
     return render(request,'acounts/reset_password.html')
+
+@login_required(login_url='login')
+def my_orders(request):
+    orders=Order.objects.filter(user=request.user).order_by('-created_at')
+    order_products=OrderProduct.objects.all()
+    context={
+        'orders':orders,
+        'order_product':order_products
+    }
+
+    return render(request,'acounts/my_orders.html',context)
+
+def or_pr_detail(request, order_product_id):
+    # Fetch the specific order product based on the provided ID
+    order_product = get_object_or_404(OrderProduct, id=order_product_id)
+
+    # You can also fetch related order details if needed
+    order = order_product.order
+
+    context = {
+        'order_product': order_product,
+        'order': order,  # Include order details if needed
+    }
+
+    return render(request, 'acounts/order-product-detail.html', context)    
+
+@login_required(login_url='login')        
+def edit_profile(request):      
+    userprofile=get_object_or_404(UserProfile,user=request.user)
+    if request.method=='POST':       
+        user_form=UserForm(request.POST,instance=request.user)
+        profile_form=UserProfileForm(request.POST,request.FILES,instance=userprofile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request,'Your profile has been updated')
+            return redirect('edit_profile')        
+    else:
+            user_form=UserForm(instance=request.user)
+            profile_form=UserProfileForm(instance=userprofile)
+            
+    context={
+            'user_form':user_form,
+            'profile_form':profile_form,
+            'userprofile':userprofile
+        }   
+    return render(request,'acounts/edit_profile.html',context)    
+ 
+@login_required(login_url='login')
+def change_password(request):
+    if request.method=='POST':
+        current_password=request.POST['current_password']
+        new_password=request.POST['new_password']
+        confirm_password=request.POST['confirm_password']
+        
+        user=Acount.objects.get(username__exact=request.user.username)
+        
+        if new_password==confirm_password:
+            success=user.check_password(current_password)
+            if success:
+                user.set_password(new_password)
+                user.save()
+                # auth.logout(request)
+                messages.success(request,'Password has been changed successfully')
+                return redirect('change_password')
+            else:
+                messages.error(request,'Enter valid current password')
+                return redirect('change_password')
+        else:
+                messages.error(request,'Password doent match')
+                return redirect('change_password')    
+    return render(request,'acounts/change_password.html')   
+
+def manage_adress(request):
+    user=request.user
+    adresses=Adress.objects.filter(user=user)
+    context={
+        'adresses':adresses
+    }
+    return render(request,'acounts/manage_adress.html',context)
+
+def add_adress(request):
+    if request.method=='POST':
+        user        =request.user
+        name        =request.POST.get('name')
+        phone_number=request.POST.get('phone_number')
+        adress_line1=request.POST.get('adress_line1')
+        adress_line2=request.POST.get('adress_line2')
+        city        =request.POST.get('city')
+        state       =request.POST.get('state')
+        country     =request.POST.get('country')
+        pincode     =request.POST.get('pin')
+        
+        
+        adress= Adress(
+                user        =user,
+                name        =name,
+                phone_number=phone_number,
+                adress_line1=adress_line1,
+                adress_line2=adress_line2,
+                city        =city,
+                state       =state,
+                country     =country,
+                pin    =pincode
+                 )
+        adress.save()
+    return redirect('manage_adress')
+
+def edit_adress(request,adress_id):
+    print('first')
+    adress=Adress.objects.get(id=adress_id)
+    print('second')
+    #copt
+    if request.method=='POST':      
+        print('got ir') 
+        adress_form=AdressForm(request.POST,instance=adress)
+        if adress_form.is_valid():
+            adress_form.save()
+        
+            messages.success(request,'Your profile has been updated')
+            return redirect('manage_adress')        
+    else:
+            adress_form=AdressForm(instance=adress)
+   
+    context={
+        'adress':adress,
+        'adress_form':adress_form
+    }
     
-        
-        
+    return render(request,'acounts/edit_adress.html',context)
+
+def delete_adress(request,adress_id):
+    adress=Adress.objects.get(id=adress_id)
+    adress.delete()
+    return redirect('manage_adress')
+
+    
+            
         
         
         

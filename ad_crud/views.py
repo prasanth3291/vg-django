@@ -6,6 +6,7 @@ from category.models import category
 from.form import ProductForm
 from django.db.models import Q
 from django.contrib import messages
+from orders.models import Order
 
 
 def ad_dashboard(request):
@@ -68,9 +69,9 @@ def add_products(request):
         else:    
             
             description     = request.POST.get('description')
-            price           = request.POST.get('price')
+            #price           = request.POST.get('price')
             image_file      = request.FILES.get('images')
-            stock           = request.POST.get('stock')
+            #stock           = request.POST.get('stock')
             is_available    = request.POST.get('is_available')
             category_id      = request.POST.get('category')
             created_date    = request.POST.get('created_date')
@@ -80,9 +81,9 @@ def add_products(request):
             product_name    = product_name,
             slug            = slug,
             description     = description,
-            price           = price,
+            #price           = price,
             images          = image_file,
-            stock           = stock,
+            #stock           = stock,
             is_available    = is_available,
             category_id     = category_id,
             created_date    = created_date,
@@ -108,8 +109,8 @@ def edit_products(request,product_id):
             product.product_name    = request.POST.get('product_name')
             product.slug            = request.POST.get('slug')
             product.description     = request.POST.get('description')
-            product.price           = request.POST.get('price')        
-            product.stock           = request.POST.get('stock')
+            #product.price           = request.POST.get('price')        
+            #product.stock           = request.POST.get('stock')
             product.is_available    = request.POST.get('is_available')
             product.category_id     = request.POST.get('category')    
             product.modified_date   = request.POST.get('modified_date')
@@ -194,6 +195,14 @@ def delete_category(request,cat_id):
         return redirect('ad_category')
     except category.DoesNotExist:
         return redirect('ad_category')
+    
+    
+def orders(request):
+    orders=Order.objects.all()
+    context={
+        'orders':orders
+    }
+    return render(request,'admins/orders.html',context)    
         
 
      

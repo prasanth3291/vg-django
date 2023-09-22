@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten padding-y bg">
+    
+
+    <div class="container">
+        {% include 'includes/alerts.html' %}
+        <div class="row">
+           
+        <main class="col-md-12 ">
+            <article class="card">
+            <header class="card-header">
+                <strong class="d-inline-block mr-3">order number :{{order.order_number}}#</strong>
+                
+            </header>
+
+            <div class="card" style=" padding:10px">
+              <div class="row no-gutters" style="align-items: center;">
+                <div class="col-md-6" style="font-weight: 500;font-style: oblique;border: 2px solid #f7f4f4; padding:10px"  >
+
+                  <h6>Delivery Adress</h6>
+                  <hr>
+
+                    <p class="card-text mb-0">{{order.full_name}}</p>
+                    <p class="card-text mb-0">{{order.full_adress}}</p>
+                    <p class="card-text mb-0">{{order.city}},{{order.state}}</p>
+                    <p class="card-text mb-0">{{order.country}}</p>
+                    <p class="card-text mb-0">{{order.email}}</p>
+                    <p class="card-text mb-0">{{order.phone_number}}</p>
+
+            </div>
+            <div class="col-md-6" style="height: 210px;border: 2px solid #f7f4f4; padding:10px;"  >
+              <h6>More actions</h6>
+              <hr>
+              {% if order.is_ordered %}
+              <div class="row " style="margin: 5px;">
+              <a href="{% url 'generate_invoice_pdf' order.id %}" class="btn btn-outline-primary">Download invoice</a>
+            </div>
+            
+            <div class="row" style="margin: 5px;">
+              <form method="post" action="{% url 'cancel_order' order.order_number %}">
+                {% csrf_token %} <!-- Include this for CSRF protection -->
+              <button class="btn btn-outline-primary" type="submit">Cancel order</button>
+            </form>
+            </div>
+            {% endif %}
+            
+
+
+            </div>
+
+
+            </div>
+            </div>
+            
+            
+                     
+            </article> <!-- order-group.// --> 
+        </main>
+    </div> <!-- row.// -->
+    </div>
+    
+    
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+
+
+{% endblock %} 

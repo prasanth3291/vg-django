@@ -65,5 +65,32 @@ class Acount(AbstractBaseUser):
     def has_module_perms(self,add_label):
         return True
     
-
+class UserProfile(models.Model):
+    user=models.OneToOneField(Acount, on_delete=models.CASCADE)    
+    adress_line1=models.CharField(blank=True, max_length=50)
+    adress_line2=models.CharField(blank=True, max_length=50)
+    profile_picture=models.ImageField(blank=True, upload_to='userprofile/',default="/static/images/logo vg.jpg") 
+    city=models.CharField(blank=True, max_length=50)
+    state=models.CharField(blank=True, max_length=50)
+    country=models.CharField(blank=True, max_length=50)
+    
+    def __str__(self):
+        return self.user.first_name
+    
+    def full_adress(self):
+        return f'{self.adress_line1} {self.adress_line2}'
+    
+    
+class Adress(models.Model):
+    user=models.ForeignKey(Acount,on_delete=models.CASCADE)
+    name=models.CharField(max_length=50)    
+    adress_line1=models.CharField(blank=True,max_length=50)
+    adress_line2=models.CharField(blank=True,max_length=50)
+    city=models.CharField( max_length=50)
+    state=models.CharField( max_length=50)
+    country=models.CharField( max_length=50)
+    pin=models.CharField( max_length=50)
+    phone_number=models.CharField(max_length=50,default='')
+    email= models.EmailField( max_length=254,default="")
+    
 # Create your models here.

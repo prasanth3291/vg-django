@@ -14,13 +14,8 @@
                     </div>
                     {% endif %}
                 
-                <div class="col-sm-6">
-                    <h4>Manage <b>Product</b></h4>
-                </div>
-                <div class="col-sm-6">
-                    <a href="#addProductModal" class="btn btn-success" data-toggle="modal"> <span>Add New Product</span></a>
-                    <a href="#deleteProductModal" class="btn btn-danger" data-toggle="modal"> <span>Delete</span></a>						
-                </div>
+               
+               
             </div>
         </div>
         <table class="table table-striped table-hover">
@@ -32,18 +27,18 @@
                             <label for="selectAll"></label>
                         </span>
                     </th>
-                    <th>Product Name</th>
-                    <th>Price</th>
-                    <th>Stock</th>
-                    <th>Category</th>
-                   
-                    <th>Modified Date</th>
-                    <th>Is available</th>
-                    <th>Actions</th>
+                    <th>Order number</th>
+                    <th>Full name</th>
+                    <th>Email</th>
+                    <th>Total order</th>
+                    <th>Payment</th>                   
+                    <th>Status</th>
+                    <th>Is Ordered</th>
+                    
                 </tr>
             </thead>
             <tbody>
-                {% for product in products %}
+                {% for order in orders %}
                 <tr>
                     <td>
                         <span class="custom-checkbox">
@@ -51,17 +46,18 @@
                             <label for="checkbox1"></label>
                         </span>
                     </td>
-                    <td>{{product.product_name}}</td>
-                    <td>{{product.price}}</td>
-                    <td>{{product.stock}}</td>
-                    <td>{{product.category}}</td>
+                    <td>{{order.order_number}}</td>
+                    <td>{{order.full_name}}</td>
+                    <td>{{order.email}}</td>
+                    <td>{{order.order_total}}</td>  
                     
+                    <td>{{order.payment.payment_method}}</td>                 
                     
-                    <td>{{product.modified_date}}</td>
-                    <td>{{product.is_available}}</td>
+                    <td>{{order.status}}</td>
+                    <td>{{order.is_ordered}}</td>
                     <td>
-                        <a href="#editProductModal-{{forloop.counter}}" class="edit btn btn-info"  data-toggle="modal">Edit</a>
-                        <a href="#deleteEmployeeModal-{{forloop.counter}}" class="delete btn btn-danger" data-toggle="modal">Delete</a>
+                        
+                        <a href="#deleteEmployeeModal-{{forloop.counter}}" class="delete btn btn-danger" data-toggle="modal">Cancel</a>
                     </td>
                 
                 </tr>
@@ -171,7 +167,7 @@
                     </div>		
                     <div class="form-group">
                         <label>Upload Image</label>                        
-                        <input name="images"  type="file" class="form-control-file" accept="image/*" ><span>{{product.images}}</span>
+                        <input name="images"  type="file" class="form-control-file" accept="image/*" >
                     </div>
                     <input type="hidden" name="current_image" value="{{product.images}}"> 
                     

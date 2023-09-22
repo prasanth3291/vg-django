@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten padding-y bg">
+    
+
+    <div class="container">
+        {% include 'includes/alerts.html' %}
+        <div class="row">
+            {% include 'includes/dashboard_sidebar.html' %}
+        <main class="col-md-9 ">
+            <article class="card">
+            <header class="card-header">
+                <strong class="d-inline-block mr-3">Your order history</strong>
+                
+            </header>
+            {% if orders %}
+    
+            {% for order in orders %}
+            
+            {% for order_product in order.orderproduct_set.all %}
+
+            <a href="{% url 'or_pr_detail' order_product.id %}">
+            <div class="card" style="margin:10px ;">
+                <div class="row no-gutters" style="align-items: center;">
+                  <div class="col-md-2"  >
+                    <img src="{{ order_product.product.images.url }}" style="padding: 10px;height: 100px; width:100px" alt="{{ order_product.product.product_name }} Image">
+                  </div>
+                  <div class="col md-2" style="text-align: left;">
+                    
+                    
+                    {% for variation in order_product.variations.all %}    
+                                
+                    
+                    {% if variation.variation_category == 'color' %}
+                        <p class="mb-0 ms-0" style="color: rgb(165, 160, 154);">Color: {{ variation.variation_value }}</p>
+                      
+                    {% elif variation.variation_category == 'size' %}
+                        <p style="color: rgb(171, 164, 156);">Size: {{ variation.variation_value }}</p>  
+
+                      
+                    {% endif %}
+                    {% endfor %}
+                
+                  </div>
+                  <div class="col-md-4">
+                    <div class="card-body">
+                      <h6>{{ order_product.product.product_name }}</h6>
+                      <p class="mb-0">Quantity: {{ order_product.quantity }}</p>
+                      <p>Price per unit: {{ order_product.product_price }}</p>
+                  </div>                  
+                </div>
+                <div class="col-md-4">
+                  <div class="card-body">
+                    <h6>{{ order.created_at }}</h6>
+                    {% if order.is_ordered %}
+                    <p class="mb-0">Order placed <span style="font-size: large;font-weight: bolder;">successfully</span></p>
+                    {% else %}
+                    <p>Order is <span style="font-size: large;font-weight: bolder;">cancelled</span></p>
+                    {% endif %}
+                </div>                  
+              </div>
+                
+              </div>
+            </div>
+              
+            
+              {% endfor %}  
+            {% endfor %}
+          </a>
+        
+    {% else %}
+        <p>No orders available.</p>
+    {% endif %}
+         
+            </article> <!-- order-group.// --> 
+        </main>
+    </div> <!-- row.// -->
+    </div>
+    
+    
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+
+
+{% endblock %} 

@@ -143,27 +143,30 @@
     
     <div class="row">
         {% for item in products %}
-        <div class="col-md-4">
-            <figure class="card card-product-grid">
-                <div class="img-wrap"> 
-                    
-                    <a href="{{item.get_url}}"><img src="{{ item.images.url }}"></a>
-                    
-                </div> <!-- img-wrap.// -->
-                <figcaption class="info-wrap">
-                    <div class="fix-height">
-                        <a href="{{item.get_url}}" class="title">{{ item.product_name }}</a>
-                        <div class="price-wrap mt-2">
-                            <span class="price">{{ item.price }}</span>
-                            <del class="price-old">$1980</del>
-                        </div> <!-- price-wrap.// -->
-                    </div>
-                    <a href="{{ item.get_url }}" class="btn btn-block btn-primary">View details</a>
-                </figcaption>
-            </figure>
-        </div> <!-- col.// -->
-    
-        {% endfor %}
+    <div class="col-md-4">
+        <figure class="card card-product-grid">
+            <div class="img-wrap"> 
+                <a href="{{ item.get_url }}"><img src="{{ item.images.url }}"></a>
+            </div> <!-- img-wrap.// -->
+            <figcaption class="info-wrap">
+                <div class="fix-height">
+                    <a href="{{ item.get_url }}" class="title">{{ item.product_name }}</a>
+                    <div class="price-wrap mt-2">
+                        <span class="price">
+                            {% with first_variation=item.variation_set.first %}
+                            ${{ first_variation.price }}
+                        {% endwith %}
+                        </span>
+                        <del class="price-old">$1980</del>
+                    </div> <!-- price-wrap.// -->
+                </div>
+                <a href="{{ item.get_url }}" class="btn btn-block btn-primary">View details</a>
+            </figcaption>
+        </figure>
+    </div> <!-- col.// -->
+
+    {% endfor %}
+
         
     </div> <!-- row end.// -->
     

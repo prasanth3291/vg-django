@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'acounts',
     'ad_crud',
     'carts',
-    'softdelete'
+    'softdelete',
+    'orders'
     
     
 ]
@@ -72,7 +73,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'category.context_processors.menu_links',
-                'carts.context_processors.counter'
+                'carts.context_processors.counter',
             ],
         },
     },
@@ -154,8 +155,8 @@ MESSAGE_TAGS = {
 
 EMAIL_HOST='smtp.gmail.com'
 EMAIL_PORT=587
-EMAIL_HOST_USER='voguevilla3@gmail.com'
-EMAIL_HOST_PASSWORD='dipncmbquroxwjzv'
+EMAIL_HOST_USER='vgvilla321@gmail.com'
+EMAIL_HOST_PASSWORD='liwz nfjx fzlt hbgl'
 EMAIL_USE_TLS=True
 
 LOGIN_URL = '/login/'

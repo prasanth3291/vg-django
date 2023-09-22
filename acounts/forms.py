@@ -1,5 +1,5 @@
 from django import forms
-from .models import Acount
+from .models import Acount,UserProfile,Adress
 
 class RegistrationForms(forms.ModelForm):
     password=forms.CharField(widget=forms.PasswordInput(attrs={'placeholder' : 'enter password'})) 
@@ -24,4 +24,42 @@ class RegistrationForms(forms.ModelForm):
                'password does not match'
                
            ) 
+    def __init__(self,*args, **kwargs) :
+        super(RegistrationForms,self).__init__(*args,**kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class']='form-control'
+         
+           
+           
+class UserForm(forms.ModelForm):
+    class Meta:
+        model=Acount
+        fields=['first_name','last_name','phone_number'] 
+        
+        
+    def __init__(self,*args, **kwargs) :
+        super(UserForm,self).__init__(*args,**kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class']='form-control'
+        
+class UserProfileForm(forms.ModelForm):
+    profile_picture=forms.ImageField(required=False,error_messages={'invalid':("image files only")},widget=forms.FileInput)
+    class Meta:
+        model=UserProfile  
+        fields=['adress_line1','adress_line2','profile_picture','city','state','country']    
+        
+    
+    def __init__(self,*args, **kwargs) :
+        super(UserProfileForm,self).__init__(*args,**kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class']='form-control'   
+            
+class AdressForm(forms.ModelForm):
+    class Meta:
+        model=Adress    
+        fields=['name','phone_number','email','adress_line1','adress_line2','pin','city','state','country']   
+    def __init__(self,*args, **kwargs) :
+        super(AdressForm,self).__init__(*args,**kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class']='form-control'                         
         
