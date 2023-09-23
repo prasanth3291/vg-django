@@ -1,3 +1,4 @@
+
 <header class="section-header">
     <nav class="navbar p-md-0 navbar-expand-sm navbar-light border-bottom" style="background-color: rgb(232, 245, 240);">
     <div class="container" >
@@ -47,12 +48,61 @@
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="{% url 'store' %}">All Products</a>
                     {% for category in links %}
-                    <a class="dropdown-item" href="{{category.get_url}}">{{category.category_name}}</a>
+                    <div class="dropdown">
+                        <a class="dropdown-item main-category-link" href="{{ category.get_url }}">
+                            {{ category.category_name }}
+                        </a>
+                        <div class="dropdown-menu subcategories">
+                            {% for subcategory in links1.all %}
+                            <a class="dropdown-item subcategory-item" href="{% url 'Sub_product' category.id subcategory.id %}">
+                                {{ subcategory.sub_cat_name }}
+                            </a>
+                 {% endfor %}
+                        </div>
+                    </div>
                     {% endfor %}
-                    
-                    
+        
                 </div>
+                
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function () {
+    // Offset to adjust the vertical position of the submenu
+    const verticalOffset =1; // You can adjust this value as needed
+    
+    // Show submenu on hover and hide on mouseout
+    $(".main-category-link").hover(
+        function () {
+            // Calculate the position of the submenu based on the main menu
+            const mainCategoryOffset = $(this).offset();
+            const submenu = $(this).siblings(".subcategories");
+            const submenuWidth = submenu.width();
+            submenu.css({
+                top:  verticalOffset, // Apply the offset
+                left: 150,
+                display: "block"
+            });
+        },
+        function () {
+            $(this).siblings(".subcategories").hide();
+        }
+    );
+    
+    // Prevent submenu from hiding when interacting with it
+    $(".subcategories").hover(
+        function () {
+            $(this).show();
+        },
+        function () {
+            $(this).hide();
+        }
+    );
+});
+</script>
+
+                
             </div>  <!-- category-wrap.// -->
+
         </div> <!-- col.// -->
         <a href="{% url 'store' %}" class="btn btn-outline-primary">Store</a>
         <div class="col-lg  col-md-6 col-sm-12 col">

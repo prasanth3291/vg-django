@@ -27,5 +27,8 @@ class Sub_category(models.Model):
     
     def __str__(self):
         return self.sub_cat_name 
+    
+    def get_url(self):
+        return reverse('product_by_sub_category',args=[self.slug])
 
 # Create your models here.

@@ -1,6 +1,6 @@
 from django.shortcuts import render,get_object_or_404,redirect
 from.models import Product,Variation
-from category.models import category
+from category.models import category,Sub_category
 from django.views.decorators.cache import never_cache
 from carts.models import CartItem,Carts
 from carts.views import cart_id
@@ -12,24 +12,46 @@ import json
 def store(request,category_slug=None):
     categories=None
     products=None
-    
-    if category_slug !=None:
+    print(category_slug)
+   
+    if category_slug !=None :
+        print('1')
         category_slug = category_slug.strip()
         categories=get_object_or_404(category,slug=category_slug)
+        #subcategory=Sub_category.objects.filter(categories=categories)
         products=Product.objects.all().filter(category=categories,is_available=True).order_by('id')
         product_count=products.count()
+   
     else:    
+        print('3')
     
         products=Product.objects.all().filter(is_available=True)        
         product_count=products.count()
-        
-        
-        
+   
     context= {
         'products':products,
-        'product_count':product_count
+        'product_count':product_count,
+        
+        
     }
     return render(request,('store/store.html'),context)
+@never_cache
+def Sub_product(request,category_id=None,subcategory_id=None):
+
+    categories=get_object_or_404(category,id=category_id)
+    sub_category=get_object_or_404(Sub_category,id=subcategory_id)
+    products=Product.objects.filter(category=categories,subcategory=sub_category)
+    product_count=products.count()    
+
+    context= {
+        'products':products,
+        'product_count':product_count,
+        
+        
+    }
+    return render(request,('store/store.html'),context)
+
+
 
 @never_cache
 def product_detail(request,category_slug,Product_slug):
