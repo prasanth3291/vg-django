@@ -11,7 +11,7 @@
 <div class="container">
 
 <div class="intro-banner-wrap">
-	<img src="{% static 'images/banners/1.jpg' %}" class="img-fluid rounded">
+	<img src="/static/images/1600w-2Mz05KTF4w0.webp" class="img-fluid rounded">
 </div>
 
 </div> <!-- container //  -->
@@ -22,7 +22,7 @@
 <section class="section-name padding-y-sm">
 <div class="container">
 
-<header class="section-heading">
+<header class="section-heading" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
 	<a href="./store.html" class="btn btn-outline-primary float-right">See all</a>
 	<h3 class="section-title">Popular products</h3>
 </header><!-- sect-heading -->
@@ -30,10 +30,11 @@
 
 
 	
-<div class="row">
+<div class="row" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
 	{% for item in products %}
+	{% if item.variation_set %}
 	<div class="col-md-3">
-		<div class="card card-product-grid">
+		<div class="card card-product-grid" style="align-items: center;">
 			<a href="{{item.get_url}}" class="img-wrap"> <img src="{{item.images.url}}"> </a>
 			<figcaption class="info-wrap">
 				<a href="{{item.get_url}}" class="title">{{item.product_name}}</a>
@@ -41,7 +42,7 @@
 			</figcaption>
 		</div>
 	</div> <!-- col.// -->
-
+	{% endif %}
 	{% endfor %}
 
 </div> <!-- row.// -->

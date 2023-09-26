@@ -8,7 +8,7 @@
 
 
 <!-- ========================= SECTION PAGETOP ========================= -->
-<section class="section-pagetop bg">
+<section class="section-pagetop bg" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
     {% if 'search' in request.path %}
 
     <div class="container" style="height: 30px; ">
@@ -18,13 +18,14 @@
      {% else %}
     <div class="container" style="height: 300px; background-image: url(https://c4.wallpaperflare.com/wallpaper/234/873/314/model-women-wallpaper-preview.jpg);">
         
-     {% endif %}   
+    
     </div> <!-- container //  -->
+    {% endif %}  
     </section>
     <!-- ========================= SECTION INTRO END// ========================= -->
     
     <!-- ========================= SECTION CONTENT ========================= -->
-    <section class="section-content padding-y">
+    <section class="section-content padding-y" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
     <div class="container">
         
     
@@ -143,7 +144,8 @@
     
     <div class="row">
         {% for item in products %}
-    <div class="col-md-4">
+        {% if item.variation_set.exists %}
+    <div class="col-md-4 d-flex justify-content-center align-items-center text-center">
         <figure class="card card-product-grid">
             <div class="img-wrap"> 
                 <a href="{{ item.get_url }}"><img src="{{ item.images.url }}"></a>
@@ -152,18 +154,24 @@
                 <div class="fix-height">
                     <a href="{{ item.get_url }}" class="title">{{ item.product_name }}</a>
                     <div class="price-wrap mt-2">
-                        <span class="price">
+                        <span class="price" style="font-size: medium;">
                             {% with first_variation=item.variation_set.first %}
+                            {% if item.offer %}                           
+                            ${{first_variation.offer_price}}                        
+                            <del class="price-old">  ${{first_variation.price}}</del> <span style="color: rgb(11, 122, 85);font-size: small;"> {{item.offer.discount.discount}}% offer</span></span>
+                            {% else %}                            
                             ${{ first_variation.price }}
+                            {% endif %}
                         {% endwith %}
-                        </span>
-                        <del class="price-old">$1980</del>
+                       
+                       
                     </div> <!-- price-wrap.// -->
                 </div>
                 <a href="{{ item.get_url }}" class="btn btn-block btn-primary">View details</a>
             </figcaption>
         </figure>
     </div> <!-- col.// -->
+    {% endif %}
 
     {% endfor %}
 

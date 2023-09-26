@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
 from twilio.rest import Client
 
+
 class MyacountManager(BaseUserManager):
     def create_user(self,first_name,last_name,username,email,password=None):
         if not email:
@@ -92,5 +93,20 @@ class Adress(models.Model):
     pin=models.CharField( max_length=50)
     phone_number=models.CharField(max_length=50,default='')
     email= models.EmailField( max_length=254,default="")
+    
+    
+class Coupons(models.Model):
+    name=models.CharField(max_length=50)
+    discount=models.PositiveIntegerField()
+    valid_from=models.DateField()
+    valid_to=models.DateField()
+    user=models.ManyToManyField(Acount,blank=True,null=True)
+    status=models.BooleanField(default=False)
+    
+    def __str__(self):
+        return self.name
+
+    
+    
     
 # Create your models here.

@@ -27,6 +27,8 @@ def store(request,category_slug=None):
     
         products=Product.objects.all().filter(is_available=True)        
         product_count=products.count()
+        
+        
    
     context= {
         'products':products,
@@ -65,6 +67,18 @@ def product_detail(request,category_slug,Product_slug):
     
     unique_color=set()    
     unique_size={}
+    # check for out of stock    
+    stock=0
+    oos=False
+    try:        
+        for variation in single_product.variation_set.all():
+            stock+=variation.stock        
+        if stock<1:
+            oos=True   
+    except:
+        pass  
+    # end oos
+    
     for variation in single_product.variation_set.all():
         if variation.color.color_name not in unique_color:
             unique_color.add(variation.color.color_name)
@@ -83,6 +97,7 @@ def product_detail(request,category_slug,Product_slug):
         'unique_color':unique_color,
         'unique_size':unique_size,
         'sizesByColor': json.dumps(unique_size),
+        'oos':oos
     }
     
     return render(request,'store/product_detail.html',context)
@@ -106,10 +121,15 @@ def get_variation_price(request):
                 color__color_name=color,
                 size__size=size
             )
-            
+            offer_price = variation.offer_price
+            regular_price = variation.price
 
-            # Return the variation's price as a JSON response
-            return JsonResponse({'price': variation.price})
+            response_data = {
+            'offer_price': offer_price,
+            'price': regular_price
+        }
+
+            return JsonResponse(response_data)
         except Variation.DoesNotExist:
             # Handle the case where no matching variation is found
             return JsonResponse({'price': 0})
@@ -131,3 +151,4 @@ def search(request):
             return render(request,('store/store.html'),context)
         else:
             return redirect(store)
+                

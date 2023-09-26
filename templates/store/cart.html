@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<section class="section-content padding-y bg">
+<section class="section-content padding-y bg" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
     <div class="container">
 
         {% if not cart_items %}
@@ -72,8 +72,13 @@
         </td>
         <td> 
             <div class="price-wrap"> 
+                {% if cart_item.variations.offer_price %}                
+                <var class="price">$ {{cart_item.sub_total}}</var>
+                <del>$ {{cart_item.sub_total_actual}}</del>
+                {% else %}
                 <var class="price">$ {{cart_item.sub_total}}</var> 
-                <small class="text-muted">$ {{cart_item.product.price}} each </small> 
+                {% endif %}
+                <small class="text-muted">$ {{cart_item.variations.price}} each </small> 
             </div> <!-- price-wrap .// -->
         </td>
         <td class="text-right"> 

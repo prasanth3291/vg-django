@@ -1,26 +1,38 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<section class="section-content padding-y bg">
-    <div class="container">
+<section class="section-content padding-y bg" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
+    <div class="container" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
 
         <!-- ============================ COMPONENT 1 ================================= -->
-
+        <div>
+            {% if messages %}
+            {% for message in messages %}
+                {% if 'address-error' in message.tags %}
+                    <div class="address-error">
+                        <p class="alert text-danger" style="font-size: large;font-weight: 900;font-family: 'Gill Sans', 'Gill Sans MT', Calibri,
+                        'Trebuchet MS', sans-serif;">{{ message }}</p>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </div>
         <div class="row">
-            <aside class="col-lg-6">
+            <aside class="col-lg-6">                
                 <div class="card">
+                  
                     <div class="card-body">
                         <h4 class="card-title mb-4">Billing Address</h4>
+                        
                         <form action="{% url 'place_order' %}" method="POST" id="addressForm">
-                            {% csrf_token %}
-                            
+                            {% csrf_token %}                            
                             <!-- Radio buttons for selecting either saved or new address -->
                            
                             <div class="form-check">
                                 {% for address in saved_addresses %}
                                 <input type="radio" class="form-check-input" name="selected_address" value="{{ address.id }}" id="address{{ address.id }}">
                                 <label class="form-check-label" for="address{{ address.id }}">
-                                    {{ address.name }} <br> {{ address.address_line1 }} <br> {{ address.city }}
+                                    {{ address.name }} <br> {{ address.adress_line1 }} <br> {{ address.city }}
                                     <br> {{ address.state }} <br> {{ address.country }} <br> {{ address.pin }}
                                 </label><br>
                                 <hr>
@@ -152,7 +164,7 @@
                                                             </form>
                                                         </div>
                                                     </div> <!-- input-group.// -->
-                                                </div> <!-- col.// -->
+                                                
                                 </td>
                                 <td> 
                                     <div class="price-wrap"> 
@@ -162,13 +174,70 @@
                                 </td>
                                 
                             </tr>
-                            {% endfor %}
+                            {% endfor %}   
+                        </div> <!-- col.// -->
+                            
                            
                             </tbody>
+                        
                             </table>
+                            
+                            
+                            
                     </div> <!-- card-body.// -->
-                </div> <!-- card.// -->
+                    
+    
+                        <div class="card">
+                        <div class="card-body" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">
+                            <dl class="dlist-align">
+                              <dt>Total price:</dt>
+                              <dd class="text-right">$ {{total}}</dd>
+                            </dl>
+                            <dl class="dlist-align">
+                              <dt>Tax:</dt>
+                              <dd class="text-right">${{tax}}</dd>
+                            </dl>
+                            <dl class="dlist-align">
+                              <dt>Total:</dt>
+                              <dd class="text-right text-dark b"><strong>$ {{grand_total}}</strong></dd>
+                            </dl>
+                            <hr>
+                            {% if used is True %}
+
+                            {% include 'includes/alerts.html' %}
+                            
+                            {% elif status is True %}
+
+                            <h6 style="text-align: center;color: rgb(57, 207, 230);">Coupon <span style="background-color: rgb(246, 96, 96);font-weight: bolder;"> {{valid_coupon.name}} </span></span>  applied, {{valid_coupon.discount}}% discount on total purchase</h6>
+                            {% else %}
+                            <form action="{% url 'checkout' %}" method="post">
+                                {% csrf_token %}
+                                
+                                <div class="row">
+                                    {% for coupon in coupons %}
+
+                                                
+                                                    <div class="col-9 p-2"  >
+                                                        <h5 class="text-center p-2" style="border-color: rgb(51, 49, 46);
+                                                        background-color: rgb(246, 249, 204);" >{{ coupon.name }}</h5></div>
+                                                    <div class="col-3 p-2" ><button type="submit" name="selected_coupon" 
+                                                        value="{{ coupon.id }}" class="btn btn-primary btn-block ">Apply Coupon</button>                                                                                                   
+                                                    </div>                     
+                                                                                   
+
+                                    {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </form>
+                            
+                            
+                        </div> <!-- card-body.// -->
+                        </div> <!-- card.// -->
+                
+             
+                
             </aside> <!-- col.// -->
+                        
         </div>
     </div> <!-- container .//  -->
 </section>

@@ -1,10 +1,10 @@
 from django.shortcuts import render,redirect,get_object_or_404,HttpResponse
 from store.models import Product,Variation,Color,Size
-from carts.models import Carts,CartItem
+from carts.models import Carts,CartItem,UserCoupons
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
-from acounts.models import Adress
-
+from acounts.models import Adress,Coupons
+from django.contrib import messages,auth
 def cart_id(request):
     cart=request.session.session_key
     if not cart:
@@ -170,14 +170,21 @@ def carts(request,total=0,quantity=0,cart_items=None):
             cart=Carts.objects.get(cart_id=cart_id(request))
             cart_items=CartItem.objects.filter(cart=cart,is_active=True).order_by('product')
             
-        for cart_item in cart_items:
-            print(cart_item)
-            print(cart_item.variations.price)
-            
-            total += (cart_item.variations.price * cart_item.quantity)
+        for cart_item in cart_items:  
+            price=0          
+            try:
+                if cart_item.variations.offer_price:
+                    price=cart_item.variations.offer_price
+                else:
+                    price=cart_item.variations.price   
+            except:
+                pass         
+                
+            total += (price * cart_item.quantity)
             quantity += cart_item.quantity
         tax=(total * 18 )/100
         grand_total=total+tax    
+        grand_total=round(grand_total,2)
     except ObjectDoesNotExist:
             pass    
     context= {
@@ -225,36 +232,140 @@ def remove_cart_item(request,product_id,cart_item_id):
 
 
 @login_required(login_url='login') 
-def checkout(request,total=0,quantity=0,cart_items=None):
-    tax=0
-    grand_total=0
+def checkout(request,total=0,quantity=0,cart_items=None): 
+
+    total=0
+    discount=0
+    tax=0   
+    grand_total=0       
+    status=False
+    used=False
     current_user=request.user
     saved_addresses = Adress.objects.filter(user=current_user)
-    try:
-        if request.user.is_authenticated:
-            print("authenticated part")
-            cart_items=CartItem.objects.filter(user=request.user,is_active=True).order_by('product')
-        else:    
+    #if the request method is post.ie when someone aplly coupon
+    if request.method=='POST':
+        
+        user=request.user
+        coupon_id=request.POST.get('selected_coupon')#fetch the coupen id from form
+        valid_coupon=get_object_or_404(Coupons,id=coupon_id)# get the corresponding coupon
+        coupons=Coupons.objects.filter(user=request.user)#fetch all coupons of the user    
+        user_coupons=UserCoupons.objects.filter(user=request.user)#get user all applied coupon if any
+        if not UserCoupons.objects.filter(user=request.user,coupon=valid_coupon).exists():                         
+                discount=valid_coupon.discount
+                user_coupon=UserCoupons.objects.create(
+                    coupon=valid_coupon,
+                    user=request.user,
+                    applied=True,
+                    is_active=True
+               )
+                user_coupon.save
+                status=True            
+        else:
+            user_coupon=get_object_or_404(UserCoupons,coupon=valid_coupon,user=request.user)
+            if user_coupon.is_active:             
+                discount=valid_coupon.discount
+                status=True
+                user_coupon.applied=True
+                user_coupon.save()
+            else:
+                used=True
+                messages.error(request,"Coupon Already availed")                
+                #here nee to alert the coupon is already used 
+                try:
+                    if request.user.is_authenticated:          
+                        cart_items=CartItem.objects.filter(user=request.user,is_active=True).order_by('product')            
+                    else:  
+                        cart=Carts.objects.get(cart_id=cart_id(request))
+                        cart_items=CartItem.objects.filter(cart=cart,is_active=True).order_by('product')
+                    for cart_item in cart_items:
+                        price=cart_item.variations.offer_price if cart_item.variations.offer_price is not None else cart_item.variations.price
+                        total += (price * cart_item.quantity)
+                        quantity += cart_item.quantity                           
+                    tax=(total * 18 )/100
+                    grand_total=total+tax
+                    total = round(total, 2)
+                    tax = round(tax, 2)    
+                    grand_total = round(grand_total, 2)
+                except ObjectDoesNotExist:
+                    pass    
+                context= {
+                'total':total,
+                'quantity':quantity,
+                'cart_items':cart_items,
+                'tax':tax,
+                'grand_total':grand_total,
+                'saved_addresses':saved_addresses,
+                'coupons':coupons,
+                'user_coupon':user_coupon ,
+                'used':used        
+                    }                  
+                return render(request,'store/checkout.html',context)                             
+        try:
+            if request.user.is_authenticated:          
+                cart_items=CartItem.objects.filter(user=request.user,is_active=True).order_by('product')            
+            else:  
+                cart=Carts.objects.get(cart_id=cart_id(request))
+                cart_items=CartItem.objects.filter(cart=cart,is_active=True).order_by('product')
+            for cart_item in cart_items:
+                price=cart_item.variations.offer_price if cart_item.variations.offer_price is not None else cart_item.variations.price
+                total += (price * cart_item.quantity)
+                quantity += cart_item.quantity
+            total=total-(total*discount)/100                    
+            tax=(total * 18 )/100
+            total = round(total, 2)
+            tax = round(tax, 2)
+            grand_total=total+tax   
+            grand_total=round(grand_total, 2) 
             
-            print("else part")
-            cart=Carts.objects.get(cart_id=cart_id(request))
-            cart_items=CartItem.objects.filter(cart=cart,is_active=True).order_by('product')
-        for cart_item in cart_items:
-            total += (cart_item.variations.price * cart_item.quantity)
-            quantity += cart_item.quantity
-        tax=(total * 18 )/100
-        grand_total=total+tax    
-    except ObjectDoesNotExist:
-            pass    
-    context= {
+        except ObjectDoesNotExist:
+                pass    
+        context= {
         'total':total,
         'quantity':quantity,
         'cart_items':cart_items,
         'tax':tax,
         'grand_total':grand_total,
-        'saved_addresses':saved_addresses
-        
-    }
+        'saved_addresses':saved_addresses,
+        'coupons':coupons,
+        'valid_coupon':valid_coupon,
+        'status':status,
+        'user_coupon':user_coupon        
+                }       
+    else:
+    # reqst post method failed then part
+       
+        coupons=Coupons.objects.filter(user=request.user)     
+        user_coupons=UserCoupons.objects.filter(user=request.user,applied=True,is_active=True)    
+        if user_coupons:    
+            for user_coupon in user_coupons:
+                user_coupon.applied=False   
+                user_coupon.save()
+        try:
+            if request.user.is_authenticated:          
+                cart_items=CartItem.objects.filter(user=request.user,is_active=True).order_by('product')            
+            else:  
+                cart=Carts.objects.get(cart_id=cart_id(request))
+                cart_items=CartItem.objects.filter(cart=cart,is_active=True).order_by('product')
+            for cart_item in cart_items:
+                    price=cart_item.variations.offer_price if cart_item.variations.offer_price is not None else cart_item.variations.price
+                    total += (price * cart_item.quantity)
+                    quantity += cart_item.quantity                           
+            tax=(total * 18 )/100
+            grand_total=total+tax
+            total = round(total, 2)
+            tax = round(tax, 2)    
+            grand_total=round(grand_total,2)
+        except ObjectDoesNotExist:
+            pass    
+        context= {
+            'total':total,
+            'quantity':quantity,
+            'cart_items':cart_items,
+            'tax':tax,
+            'grand_total':grand_total,
+            'saved_addresses':saved_addresses,
+            'coupons':coupons        
+                    }                  
     return render(request,'store/checkout.html',context)
         
 

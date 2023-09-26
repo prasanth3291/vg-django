@@ -1,6 +1,7 @@
 from django.db import models
-from acounts.models import Acount
+from acounts.models import Acount,Coupons
 from store.models import Product,Variation
+from carts.models import CartItem
 
 
 class Payment(models.Model):
@@ -68,6 +69,11 @@ class OrderProduct(models.Model):
     
     def __str__(self):
         return self.product.product_name
+    
+    
+
+    
+    
     
 
     

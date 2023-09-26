@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<section class="section-content padding-y bg">
+<section class="section-content padding-y bg" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
     
         
     
@@ -37,7 +37,7 @@
                 </div>
                 <div class="card-body">
                 
-                  <p class="card-text">Cash on delivery</p>
+                  <p class="card-text" style="font-weight: 500;">PayPal</p>
                   
                 </div>
                 
@@ -67,17 +67,13 @@
                                     <figcaption class="info">
                                         <a href="{{cart_item.product.get_url }}" class="title text-dark">{{cart_item.product.product_name}}</a>
                                         <p class="text-muted small">
-                                            {% if cart_item.variations.all %}
-                    
-                                            {% for item in cart_item.variations.all %}
-                    
-                    
-                                            
-                                            {{item.variation_category | capfirst}} :  {{item.variation_value | capfirst}} <br>
-                    
-                                            {% endfor %}
-                                            {% endif %}
+                                           
+                                           Color: {{cart_item.variations.color | capfirst}} 
                                         </p>
+                                        <p class="text-muted small">
+                                           
+                                          Size: {{cart_item.variations.size | capfirst}} 
+                                       </p>
                                     </figcaption>
                                 </figure>
                             </td>
@@ -88,7 +84,12 @@
                             <td> 
                                 <div class="price-wrap"> 
                                     <var class="price">$ {{cart_item.sub_total}}</var> 
-                                    <small class="text-muted">$ {{cart_item.product.price}} each </small> 
+                                    {% if cart_item.variations.offer_price %}
+                                    <del class="price">$ {{cart_item.sub_total_actual}}</del>                                                                
+                                    
+                                    {% endif %}
+                                    
+                                    <small class="text-muted">$ {{cart_item.variations.price}} each </small> 
                                 </div> <!-- price-wrap .// -->
                             </td>
                             

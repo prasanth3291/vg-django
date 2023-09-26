@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.shortcuts import HttpResponse,get_object_or_404
 from django.http import JsonResponse
-from carts.models import CartItem
+from carts.models import CartItem,UserCoupons
 from store.models import Product
 from .form import OrderForm
 import datetime
@@ -16,7 +16,7 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from io import BytesIO
-
+from django.contrib import messages
 # Create your views here.
 def payments(request,order_number):
     # Create a payment record
@@ -39,18 +39,20 @@ def payments(request,order_number):
     cart_items=CartItem.objects.filter(user=request.user)
     for i in cart_items:
         print ("name:",i.product.product_name)
+        
     for item in cart_items:
+        price=item.variations.offer_price if item.variations.offer_price is not None else item.variations.price
         orpr=OrderProduct()
         orpr.order_id=order.id
         orpr.payment=payment
         orpr.user_id=request.user.id
         orpr.product_id=item.product_id
         orpr.quantity=item.quantity        
-        orpr.product_price=item.variations.price
-        orpr.total=item.variations.price*item.quantity
-        orpr.ordered=True
-        
+        orpr.product_price =price 
+        orpr.total=price*item.quantity
+        orpr.ordered=True        
         orpr.save()
+        print(orpr.product_price)
         #cart_item=CartItem.objects.get(id=item.id)
         #product_variation=cart_item.variations
         orderproduct=OrderProduct.objects.get(id=orpr.id)
@@ -84,7 +86,7 @@ def payments(request,order_number):
     return JsonResponse(data)
     
     
-    return render(request,'orders/order_confirmation.html') 
+    
    
 
 def place_order(request,total=0,quantity=0):
@@ -93,29 +95,53 @@ def place_order(request,total=0,quantity=0):
     cart_items=CartItem.objects.filter(user=current_user)
     cart_count=cart_items.count()
     if cart_count <=0:
-        return redirect('store')
-    
+        return redirect('store')    
+    total=0
     grand_total=0
     tax=0
+    price=0
+    user_coupon=None
+    coupon_discount=0
+    # here we will check any coupons applied still active
+    try:        
+        user_coupon=UserCoupons.objects.get(user=request.user,applied=True,is_active=True)
+        print('siccess')
+    except:
+        pass
+    # if coupon aplly discount    
+    if user_coupon:   
+        coupon_discount=user_coupon.coupon.discount 
+        
     for cart_item in cart_items:
-        total += (cart_item.variations.price * cart_item.quantity)
+        if cart_item.variations.offer_price:
+            price=cart_item.variations.offer_price
+        else:
+            price=cart_item.variations.price    
+        total += (price * cart_item.quantity)
         quantity += cart_item.quantity
-    tax=(2*total)/100
+    total=total-(total*coupon_discount)/100    
+    tax=(18*total)/100
     grand_total=total+tax    
+    total = round(total, 2)
+    tax = round(tax, 2)  
+    grand_total = round(grand_total, 2)
     
      # Retrieve the user's saved addresses
     saved_addresses = Adress.objects.filter(user=current_user)
     
-    if request.method=='POST':
-        print('ok')
-        #new
+    if request.method=='POST':      
+        #fetch the adress selected 
+        
         selected_address_id = request.POST.get('selected_address')
-
+        
         if selected_address_id !='new' :
-            print('ok2')
-            # User selected a saved address
-            selected_address = Adress.objects.get(pk=selected_address_id)
-
+            try:
+                            
+                selected_address = Adress.objects.get(pk=selected_address_id)
+            except:
+                messages.error(request,'Please choose an adress to place order', extra_tags='address-error')
+                return redirect('checkout')             
+                  
             # Create an order record with the selected address
             order1 = Order.objects.create(
                 user=current_user,
@@ -131,10 +157,8 @@ def place_order(request,total=0,quantity=0):
                   # Include order note
                 order_total=grand_total,
                 tax=tax,
-                ip=request.META.get('REMOTE_ADDR'),
-                
-            )
-       
+                ip=request.META.get('REMOTE_ADDR'),                
+            )       
                 # generate order number
             yr=int(datetime.date.today().strftime('%Y'))
             dt=int(datetime.date.today().strftime('%d'))
@@ -144,10 +168,39 @@ def place_order(request,total=0,quantity=0):
             order_number=current_date+str(order1.id)
             order1.order_number=order_number
             order1.save()
-            order=Order.objects.get(user=current_user,is_ordered=False,order_number=order_number)     
+            order=Order.objects.get(user=current_user,is_ordered=False,order_number=order_number)    
             
         else:  
-            form=OrderForm(request.POST)            
+            form=OrderForm(request.POST)
+            # save the adress if
+            selected_adress=request.POST.get('selected_address')
+            if selected_adress=='new':
+                print('get o')
+                user        =request.user
+                first_name   =request.POST.get('first_name')
+                last_name   = request.POST.get('last_name')
+                full_name    = f"{first_name} {last_name}" 
+                phone_number=request.POST.get('phone_number')
+                adress_line1=request.POST.get('adress_line1')
+                adress_line2=request.POST.get('adress_line2')
+                city        =request.POST.get('city')
+                state       =request.POST.get('state')
+                country     =request.POST.get('country')
+                pincode     =request.POST.get('pin')       
+                adress= Adress(
+                    user        =user,
+                    name        =full_name,
+                    phone_number=phone_number,
+                    adress_line1=adress_line1,
+                    adress_line2=adress_line2,
+                    city        =city,
+                    state       =state,
+                    country     =country,
+                    pin    =pincode
+                    )
+                adress.save()
+        
+            # upto here            
             if form.is_valid():
                 print('form is valid')
                 # store all the billing information inside order table 
@@ -198,15 +251,12 @@ def place_order(request,total=0,quantity=0):
         return redirect('checkout')    
     
     
-def cancel_order(request,order_number):
-    print('1')  
-    print(order_number)
+def cancel_order(request,order_number):   
     order=get_object_or_404(Order,order_number=order_number,user=request.user)
     payment=order.payment
     orpr=OrderProduct.objects.filter(order=order,payment=payment)
     print(order)
-    if request.method=='POST':
-        print('2')  
+    if request.method=='POST':    
         if order.is_ordered:
             print('3')  
             orderproducts=OrderProduct.objects.filter(order=order)
@@ -233,16 +283,21 @@ def cancel_order(request,order_number):
 def order_complete(request):
     order_number=request.GET.get('order_number')
     transID=request.GET.get('payment_id')
-    
+    # make coupon invalid
+    order=Order.objects.get(order_number=order_number)
+    try:
+        user_coupon=UserCoupons.objects.get(user=request.user,applied=True,is_active=True)
+        if order.is_ordered == True:
+            user_coupon.is_active=False    
+            user_coupon.save()   
+    except:
+        pass        
+   
     try:
         order=Order.objects.get(order_number=order_number,is_ordered=True)
-        order_products=OrderProduct.objects.filter(order_id=order.id)
-        for i in order_products:
-            print("yes",i.product.product_name)
-        payment=Payment.objects.get(payment_id=transID)
-        subtotal=0
-        for i in order_products:
-            subtotal +=i.variations.price*i.quantity
+        order_products=OrderProduct.objects.filter(order_id=order.id)     
+        payment=Payment.objects.get(payment_id=transID)     
+        subtotal=order.order_total-order.tax   
         context={
             'order':order,
             'order_products':order_products,
@@ -264,9 +319,8 @@ def generate_invoice_pdf(request,order_id):
     # Get invoice data (replace with your data retrieval logic)
     order=Order.objects.get(id=order_id)
     payment=order.payment
-    order_products=OrderProduct.objects.filter(order=order)
-
-    grand_total=order.order_total+order.tax
+    order_products=OrderProduct.objects.filter(order=order)    
+    grand_total=order.order_total
     invoice_data = {
         'invoice_number': order.order_number,
         'invoice_date': payment.created_at,

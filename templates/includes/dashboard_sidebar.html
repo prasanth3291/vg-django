@@ -7,6 +7,7 @@
         <a class="list-group-item {% if '/edit_profile' in request.path %} active {% endif %}" href="{% url 'edit_profile' %}"> Edit profile </a>
         <a class="list-group-item {% if '/change_password' in request.path %} active {% endif %}" href="{% url 'change_password' %}">Change Password </a>
         <a class="list-group-item {% if '/manage_adress' in request.path or '/edit_adress' in request.path %} active {% endif %}" href="{% url 'manage_adress' %}">Manage Adresses </a>
+        <a class="list-group-item {% if '/coupons' in request.path  %} active {% endif %}" href="{% url 'coupons' %}">Coupons </a>
         
         
     </ul>

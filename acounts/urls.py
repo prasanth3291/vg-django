@@ -21,6 +21,9 @@ urlpatterns = [
     path('or_pr_detail/<int:order_product_id>/',views.or_pr_detail,name='or_pr_detail'),
     path('edit_adress/<int:adress_id>/',views.edit_adress,name='edit_adress'),
     path('delete_adress/<int:adress_id>/',views.delete_adress,name='delete_adress'),
+    path('coupons/',views.coupons,name='coupons'),
+   
+    
     
     
     

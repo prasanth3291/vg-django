@@ -41,7 +41,27 @@ class Size(models.Model):
     def __str__(self):
         return self.size
     
+class Discount(models.Model):
+    name=models.CharField( max_length=50)   
+    discount=models.PositiveIntegerField()
+    def __str__(self):
+        return self.name     
+    
+class Offer(models.Model):
+    name=models.CharField( max_length=50)    
+    description=models.TextField()
+    start_date=models.DateField()
+    end_date=models.DateField()
+    discount=models.ForeignKey(Discount,on_delete=models.CASCADE)    
+    def __str__(self):
+        return self.name  
+class Deal(models.Model):
+    name=models.CharField( max_length=50)
+    discount=models.PositiveIntegerField()
+    def __str__(self):
+        return self.name  
         
+    
     
 
 class Product(softdelete):
@@ -54,10 +74,9 @@ class Product(softdelete):
     subcategory     = models.ForeignKey(Sub_category, on_delete=models.CASCADE,null=True)
     created_date    =models.DateTimeField(auto_now_add=True)
     modified_date   =models.DateTimeField(auto_now=True)
-   
-    
-
-    
+    discount        =models.ForeignKey(Discount,on_delete=models.CASCADE,null=True,blank=True) 
+    offer           =models.ForeignKey(Offer,on_delete=models.CASCADE,null=True,blank=True) 
+    deal            =models.ForeignKey(Deal,on_delete=models.CASCADE,null=True,blank=True) 
     def get_url(self):
         return reverse('product_detail',args=[self.category.slug,self.slug])
     
@@ -82,6 +101,7 @@ class Variation(models.Model):
     color           =models.ForeignKey(Color, on_delete=models.CASCADE,default="")
     size            =models.ForeignKey(Size, on_delete=models.CASCADE,default="")
     price           =models.IntegerField(default=0) 
+    offer_price     =models.FloatField(blank=True,null=True)
     stock           =models.IntegerField(default=0) 
     is_active=models.BooleanField(default=True)
     created_date=models.DateField(auto_now_add=True)

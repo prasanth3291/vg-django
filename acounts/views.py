@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from .forms import RegistrationForms,UserForm,UserProfileForm,AdressForm
-from.models import Acount,UserProfile,Adress
+from.models import Acount,UserProfile,Adress,Coupons
 from django.contrib import messages,auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate,login as auth_login
@@ -64,7 +64,7 @@ def register(request):
             #new
             otp=generate_random_otp()
             account_sid = "ACd61c3ec36ca81a50af865490b6342a4a"
-            auth_token = "7e218b3d29fa75c7bbee951db0815b88"
+            auth_token = "ec37d52f13ccb00c5f40188b9a01ba36"
             client = Client(account_sid, auth_token)
             message = client.messages \
                 .create(
@@ -422,6 +422,13 @@ def delete_adress(request,adress_id):
     adress=Adress.objects.get(id=adress_id)
     adress.delete()
     return redirect('manage_adress')
+
+def coupons(request):
+    user_coupons = Coupons.objects.filter(user=request.user)
+    context={
+        'user_coupons':user_coupons
+    }
+    return render(request,'acounts/coupons.html',context)
 
     
             

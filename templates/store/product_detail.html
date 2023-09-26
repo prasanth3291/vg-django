@@ -3,166 +3,144 @@
 {% load static %}
 
 {% block content %}
-
-<section class="section-content padding-y bg">
+<section class="section-content padding-y bg" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
     <div class="container">
-    
-    <!-- ============================ COMPONENT 1 ================================= -->
-    <div class="card">
-        <div class="row no-gutters">
-            <aside class="col-md-6">
-    <article class="gallery-wrap"> 
-        <div class="img-big-wrap">
-          <a href="#">
-            <img src="{{single_product.images.url}}" id="product-image" style="max-width: 100%;"
-            onmousemove="zoomImage(event)" onmouseout="resetZoom()">
-            <div id="zoomed-image-container"
-                                style="scale:1.2;position: absolute; top: 0; left: 100%; width: 400px; height: 450px; border: 2px solid #ccc; display: none; z-index:10"></div>
-        </a>
-        
-        </div> <!-- img-big-wrap.// -->
-        
+        <!-- ============================ COMPONENT 1 ================================= -->
+        <div class="card">
+            <div class="row no-gutters">
+                <aside class="col-md-6">
+                    <article class="gallery-wrap"> 
+                        <div class="img-big-wrap" style="padding: 30px;">
+                            <a href="#">
+                                <img src="{{ single_product.images.url }}" id="product-image" style="max-width: 100%;"
+                                    onmousemove="zoomImage(event)" onmouseout="resetZoom()">
+                                <div id="zoomed-image-container"
+                                    style="scale:1.2;position: absolute; top: 0; left: 100%; width: 400px; height: 450px; border: 2px solid #ccc; display: none; z-index:10"></div>
+                            </a>
+                        </div>
+                    </article>
+                </aside>
+                <main class="col-md-6 border-left">
+                    <article class="content-body">
+                        <form action="{% url 'add_cart' single_product.id %}" method="POST">
+                            {% csrf_token %}
+                            <h2 class="title">{{ single_product.product_name }}</h2>
+                            <div class="mb-3">
+                                <h6 style="color: rgb(182, 21, 21);">Special price</h6>
+                                {% if single_product.offer and single_product.offer.discount.discount > 0 %}
+                               
+                                <p class="mb-0">
+                                    <span class="price h4" id="product-price">${{ variation.offer_price }}</span>
+                                    <p class="mb-0">
+                                    <del id="original-price">${{ variation.price }}</del>
+                                    </p>
 
-        
-        
-    </article> <!-- gallery-wrap .end// -->
-            </aside>
-            <main class="col-md-6 border-left">
-    <article class="content-body">
-      <form action="{% url 'add_cart' single_product.id %}" method="POST">
-
-        {% csrf_token %}
-    
-    <h2 class="title">{{single_product.product_name}}</h2>
-    
-    <div class="mb-3">
-        <span class="h4">Price: $</span>
-        <span class="price h4" id="product-price">{{variation.price}}</span>
-    </div>
-    
-    <p>{{single_product.description}}</p>
-    
-    <hr>
-    <div class="row">
-        <div class="item-option-select" style="position: relative; z-index:2">
-            <h6>Choose Color</h6>
-            <select name="color" class="form-control" id="color-select" required onchange="updateSizeOptions()">
-                <option value="" disabled selected></option>
-                {% for color in unique_color %}
-                    <option value="{{ color }}">{{ color }}</option>
-                {% endfor %}
-            </select>
+                                    <span style="font-weight: 1000; color: rgb(20, 149, 29);">{{ single_product.offer.discount.discount }}% offer</span>
+                                </p>
+                                
+                                {% else %}
+                                    <p>
+                                        <span class="price h4" id="product-price">${{ variation.price }}</span>
+                                    </p>
+                                {% endif %}
+                            </div>
+                            <p>{{ single_product.description }}</p>
+                            <hr>
+                            <div class="row">
+                                <div class="item-option-select" style="position: relative; z-index:2">
+                                    <h6>Choose Color</h6>
+                                    <select name="color" class="form-control" id="color-select" required onchange="updateSizeOptions()">
+                                        <option value="" disabled selected></option>
+                                        {% for color in unique_color %}
+                                            <option value="{{ color }}">{{ color }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="item-option-select">
+                                    <h6>Select Size</h6>
+                                    <div id="size-options-container">
+                                        <!-- Size options will be inserted here dynamically -->
+                                        <select name="size" class="form-control" id="size-select" required onchange="updatePrice()">
+                                            <!-- Options for sizes will be inserted here dynamically -->
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            {% if oos %}
+                                <h4 class="oos" style="color:red">Product out of stock</h4>
+                            {% else %}
+                                <div style="padding-right: 5px;">
+                                    <button type="submit" class="btn btn-primary">
+                                        <span class="text">Add to cart</span>
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </form>
+                    </article>
+                </main>
+            </div>
         </div>
-    </div>
-    
-    <div class="row">
-        <div class="item-option-select">
-            <h6>Select Size</h6>
-            <div id="size-options-container">
-                <!-- Size options will be inserted here dynamically -->
-                <select name="size" class="form-control" id="size-select" required onchange="updatePrice()">
-                    <!-- Options for sizes will be inserted here dynamically -->
-                </select>
-                
+        <!-- ============================ COMPONENT 1 END .// ================================= -->
+        <br>
+        <div class="row">
+            <div class="col-md-9">
+                <header class="section-heading">
+                    <h3>Customer Reviews</h3>
+                </header>
+                <article class="box mb-3">
+                    <div class="icontext w-100">
+                        <img src="{% static 'images/avatars/avatar1.jpg' %}" class="img-xs icon rounded-circle">
+                        <div class="text">
+                            <span class="date text-muted float-md-right">24.04.2020 </span>
+                            <h6 class="mb-1">Mike John </h6>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <p>
+                            Dummy comment Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                            quis nostrud exercitation ullamco laboris nisi ut aliquip
+                        </p>
+                    </div>
+                </article>
             </div>
         </div>
     </div>
-    
-    
-        <hr>
-        {% if single_product.stock <= 0 %}
+</section>
 
-        
-        <h4 class="oos"
-        tyle="color:red">Out of stock</h4>
+<script>
+    // JavaScript for zoom effect
+    function zoomImage(event) {
+        const productImage = document.getElementById("product-image");
+        const zoomedImageContainer = document.getElementById("zoomed-image-container");
 
-        {% else %}
+        // Calculate the position of the cursor within the original image
+        const x = event.offsetX / productImage.clientWidth;
+        const y = event.offsetY / productImage.clientHeight;
 
-        
-       
+        // Calculate the background position for the zoomed container
+        const bgX = (x * 100) + "%";
+        const bgY = (y * 100) + "%";
 
-          
-    
-        <div style="padding-right: 5px;">
-          <button type="submit" class="btn  btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i></button>
-        </div>
-        
-        
-    </div>
-  </form>
+        // Set the background position and show the zoomed container
+        zoomedImageContainer.style.backgroundImage = `url('{{ single_product.images.url }}')`;
+        zoomedImageContainer.style.backgroundPosition = `${bgX} ${bgY}`;
+        zoomedImageContainer.style.display = "block";
+    }
 
-    
-    {% endif %}
-    </article> <!-- product-info-aside .// -->
-            </main> <!-- col.// -->
-        </div> <!-- row.// -->
-    </div> <!-- card.// -->
-    <!-- ============================ COMPONENT 1 END .// ================================= -->
-    
-    <br>
-    
-    <div class="row">
-                <div class="col-md-9">
-    
-        <header class="section-heading">
-            <h3>Customer Reviews </h3>  
-            
-        </header>
-            <article class="box mb-3">
-            <div class="icontext w-100">
-                <img src="{% static 'images/avatars/avatar1.jpg' %}" class="img-xs icon rounded-circle">
-                <div class="text">
-                    <span class="date text-muted float-md-right">24.04.2020 </span>  
-                    <h6 class="mb-1">Mike John </h6>
-                    
-                </div>
-            </div> <!-- icontext.// -->
-            <div class="mt-3">
-                <p>
-                    Dummy comment Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                    quis nostrud exercitation ullamco laboris nisi ut aliquip
-                </p>	
-            </div>
-        </article>
-    
-        
-    
-        </div> <!-- col.// -->
-    </div> <!-- row.// -->
-    
-    
+    function resetZoom() {
+        const zoomedImageContainer = document.getElementById("zoomed-image-container");
 
-    </section>
-    <!-- ========================= SECTION CONTENT END// ========================= -->
-    <script>
-      // JavaScript for zoom effect
-      function zoomImage(event) {
-          const productImage = document.getElementById("product-image");
-          const zoomedImageContainer = document.getElementById("zoomed-image-container");
-  
-          // Calculate the position of the cursor within the original image
-          const x = event.offsetX / productImage.clientWidth;
-          const y = event.offsetY / productImage.clientHeight;
-  
-          // Calculate the background position for the zoomed container
-          const bgX = (x * 100) + "%";
-          const bgY = (y * 100) + "%";
-  
-          // Set the background position and show the zoomed container
-          zoomedImageContainer.style.backgroundImage = `url('{{single_product.images.url}}')`;
-          zoomedImageContainer.style.backgroundPosition = `${bgX} ${bgY}`;
-          zoomedImageContainer.style.display = "block";
-      }
-  
-      function resetZoom() {
-          const zoomedImageContainer = document.getElementById("zoomed-image-container");
-  
-          // Hide the zoomed container on mouseout
-          zoomedImageContainer.style.display = "none";
-      }
-  </script>
-  <script>
+        // Hide the zoomed container on mouseout
+        zoomedImageContainer.style.display = "none";
+    }
+</script>
+
+<script>
     const sizesByColor = JSON.parse('{{ sizesByColor|safe }}');
 
     function updateSizeOptions() {
@@ -177,10 +155,7 @@
         const sizeOptionsHTML = sizesForColor.map(size => `<option value="${size}">${size}</option>`).join('');
 
         // Update the size options container with the new options
-        sizeSelect.innerHTML = `
-            
-            ${sizeOptionsHTML}
-        `;
+        sizeSelect.innerHTML = sizeOptionsHTML;
 
         // Update the onchange attribute of size-select to call updatePrice
         sizeSelect.setAttribute('onchange', 'updatePrice()');
@@ -190,29 +165,35 @@
     }
 
     function updatePrice() {
-        console.log('updatePrice function called'); 
         const colorSelect = document.getElementById('color-select');
         const sizeSelect = document.getElementById('size-select');
         const selectedColor = colorSelect.value;
         const selectedSize = sizeSelect.value;
-
-        // Make an AJAX request to get the price based on color and size
+    
+        // Make an AJAX request to get the price and offer price based on color and size
         fetch(`/store/get_variation_price/?product_id={{ single_product.id }}&color=${selectedColor}&size=${selectedSize}`)
             .then(response => response.json())
             .then(data => {
-                const price = data.price;
-                document.getElementById('product-price').textContent = price.toFixed(2); // Format price as decimal
+                const priceElement = document.getElementById('product-price');
+                const originalPriceElement = document.getElementById('original-price');
+                const offerInfoElement = document.getElementById('offer-info');
+    
+                if (data.offer_price) {
+                    // Display offer price
+                    priceElement.innerHTML = `$${data.offer_price.toFixed(2)}`;
+                    originalPriceElement.textContent = `$${data.price.toFixed(2)}`;
+                    originalPriceElement.style.display = 'block'; // Show the <del> element
+                   
+                } else {
+                    // Display only regular price
+                    priceElement.textContent = `$${data.price.toFixed(2)}`;
+                    originalPriceElement.style.display = 'none'; // Hide the <del> element
+                   
+                }
             })
             .catch(error => {
                 console.error('Error fetching price:', error);
             });
     }
-</script>
-
-
-
-         
-        
-    
-
+        </script>
 {% endblock %}

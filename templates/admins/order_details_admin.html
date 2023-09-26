@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+
 
 {% block content %}
 
@@ -34,25 +34,7 @@
                     <p class="card-text mb-0">{{order.phone_number}}</p>
 
             </div>
-            <div class="col-md-6" style="height: 210px;border: 2px solid #f7f4f4; padding:10px;"  >
-              <h6>More actions</h6>
-              <hr>
-              {% if order.is_ordered %}
-              <div class="row " style="margin: 5px;">
-              <a href="{% url 'generate_invoice_pdf' order.id %}" class="btn btn-outline-primary">Download invoice</a>
-            </div>
-            
-            <div class="row" style="margin: 5px;">
-              <form method="post" action="{% url 'cancel_order' order.order_number %}">
-                {% csrf_token %} <!-- Include this for CSRF protection -->
-              <button class="btn btn-outline-primary" type="submit">Cancel order</button>
-            </form>
-            </div>
-            {% endif %}
-            
-
-
-            </div>
+          
 
 
             </div>

@@ -5,7 +5,7 @@
 
 
 <!-- ========================= SECTION CONTENT ========================= -->
-<section class="section-conten padding-y bg">
+<section class="section-conten padding-y bg" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
     
 
     <div class="container">
@@ -33,18 +33,17 @@
                   <div class="col md-2" style="text-align: left;">
                     
                     
-                    {% for variation in order_product.variations.all %}    
+                   
                                 
                     
-                    {% if variation.variation_category == 'color' %}
-                        <p class="mb-0 ms-0" style="color: rgb(165, 160, 154);">Color: {{ variation.variation_value }}</p>
+                    
+                        <p class="mb-0 ms-0" style="color: rgb(165, 160, 154);">Color: {{ order_product.variations.color }}</p>
                       
-                    {% elif variation.variation_category == 'size' %}
-                        <p style="color: rgb(171, 164, 156);">Size: {{ variation.variation_value }}</p>  
+                    
+                        <p style="color: rgb(171, 164, 156);">Size: {{ order_product.variations.size  }}</p>  
 
                       
-                    {% endif %}
-                    {% endfor %}
+                   
                 
                   </div>
                   <div class="col-md-4">

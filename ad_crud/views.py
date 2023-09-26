@@ -198,11 +198,18 @@ def delete_category(request,cat_id):
     
     
 def orders(request):
-    orders=Order.objects.all()
+    orders=Order.objects.all().order_by('-created_at')
     context={
         'orders':orders
     }
     return render(request,'admins/orders.html',context)    
+
+def order_details_admin(request,order_id):
+    order=Order.objects.get(id=order_id)
+    context={
+        'order':order
+    }
+    return render(request,'admins/order_details_admin.html',context)
         
 
      
