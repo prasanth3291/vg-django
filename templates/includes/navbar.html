@@ -129,25 +129,27 @@ $(document).ready(function () {
                             </div>
                             {% else %}
                             
-                        <div class="widget-header">                         
-                            <small class="title text-muted">{{user.first_name}}</small>
-                            <div> 
+                        <div class="widget-header" style="justify-content: space-around;margin-left: 25px;">                         
+                            <small class="title text-muted " >{{user.first_name}}</small>
+                            <div class=""> 
                                 <a href="{% url 'login' %}">Dashboard</a> <span class="dark-transp"> | </span>
                                 <a href="{% url 'logout' %}"> Logout</a>
                             </div>
                             {% endif %}
                         </div>
 
-                        <a href="{% url 'carts' %}" class="widget-header pl-3 ml-3">
+                        <a href="{% url 'carts' %}" class="widget-header pl-1 ml-1">
                             <div class="icon icon-sm rounded-circle border"><i class="fa fa-shopping-cart"></i></div>
                             {% if cart_count %}
                             <span class="badge badge-pill badge-danger notify">{{cart_count}}</span>
                             {% endif %}
                         </a>
-                        <!---                      <a href="#" class="widget-header pl-3 ml-3">
+                         <a href="{% url 'wish_list' %}" class="widget-header pl-1 ml-1 d-none d-sm-inline">
                             <div class="icon icon-sm rounded-circle border"><i class="fa fa-heart" aria-hidden="true"></i></div>
-                            <span class="badge badge-pill badge-danger notify">0</span>
-                        </a>-->
+                            {% if wish_list_count %}
+                            <span class="badge badge-pill badge-danger notify">{{wish_list_count}}</span>
+                            {% endif %}
+                        </a>
 
  
                     </div> <!-- widgets-wrap.// -->

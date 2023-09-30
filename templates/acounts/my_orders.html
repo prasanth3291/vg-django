@@ -21,56 +21,70 @@
             {% if orders %}
     
             {% for order in orders %}
+            {% if order.status == 'Completed' or  order.status == 'Cancelled' %}
+           
+            <div class="card" style="margin:10px ;">          
+            
+            
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Order number: #{{order.order_number}}</th> 
+                      <th scope="col" style="padding-left: 400px;"> {{order.created_at}}</th>
+                      
+
+                      
+                    
+                    
+                  </tr>
+                </thead>
+               
+              </table>
+            
             
             {% for order_product in order.orderproduct_set.all %}
+            
 
             <a href="{% url 'or_pr_detail' order_product.id %}">
-            <div class="card" style="margin:10px ;">
-                <div class="row no-gutters" style="align-items: center;">
-                  <div class="col-md-2"  >
+              
+                  <div class="row no-gutters" style="align-items: center;">
+                    <div class="col-md-2"  >
                     <img src="{{ order_product.product.images.url }}" style="padding: 10px;height: 100px; width:100px" alt="{{ order_product.product.product_name }} Image">
-                  </div>
-                  <div class="col md-2" style="text-align: left;">
+                    </div>
+                    <div class="col md-2" style="text-align: left;">                    
+                        <p class="mb-0 ms-0" style="color: rgb(165, 160, 154);">Color: {{ order_product.variations.color }}</p>                  
                     
-                    
-                   
-                                
-                    
-                    
-                        <p class="mb-0 ms-0" style="color: rgb(165, 160, 154);">Color: {{ order_product.variations.color }}</p>
-                      
-                    
-                        <p style="color: rgb(171, 164, 156);">Size: {{ order_product.variations.size  }}</p>  
-
-                      
+                        <p style="color: rgb(171, 164, 156);">Size: {{ order_product.variations.size  }}</p>                    
                    
                 
-                  </div>
-                  <div class="col-md-4">
+                    </div>
+                    <div class="col-md-4">
                     <div class="card-body">
                       <h6>{{ order_product.product.product_name }}</h6>
                       <p class="mb-0">Quantity: {{ order_product.quantity }}</p>
                       <p>Price per unit: {{ order_product.product_price }}</p>
                   </div>                  
-                </div>
-                <div class="col-md-4">
+                    </div>
+                    <div class="col-md-4">
                   <div class="card-body">
-                    <h6>{{ order.created_at }}</h6>
+                    
                     {% if order.is_ordered %}
                     <p class="mb-0">Order placed <span style="font-size: large;font-weight: bolder;">successfully</span></p>
                     {% else %}
-                    <p>Order is <span style="font-size: large;font-weight: bolder;">cancelled</span></p>
+                    <p>Order is <span style="color: brown;font-size: large;font-weight: bolder;">cancelled</span></p>
                     {% endif %}
                 </div>                  
-              </div>
-                
-              </div>
-            </div>
-              
+                    </div>                
+                  </div>
+             
+            </a>
+            
             
               {% endfor %}  
+            </div>
+            {% endif %}
             {% endfor %}
-          </a>
+          
         
     {% else %}
         <p>No orders available.</p>
@@ -78,7 +92,7 @@
          
             </article> <!-- order-group.// --> 
         </main>
-    </div> <!-- row.// -->
+        </div> <!-- row.// -->
     </div>
     
     

@@ -1,12 +1,13 @@
 from django.shortcuts import render,redirect
 from django.shortcuts import HttpResponse,get_object_or_404
-from acounts.models import Acount
+from acounts.models import Acount,Coupons,UserProfile
 from store.models import Product,softdelete,NonDeleted
 from category.models import category
-from.form import ProductForm
+from.form import ProductForm,CouponsForm
 from django.db.models import Q
 from django.contrib import messages
-from orders.models import Order
+from orders.models import Order,OrderProduct
+from carts.models import UserCoupons
 
 
 def ad_dashboard(request):
@@ -206,10 +207,102 @@ def orders(request):
 
 def order_details_admin(request,order_id):
     order=Order.objects.get(id=order_id)
+    order_products=OrderProduct.objects.filter(order=order)
+    print(order_products)
     context={
-        'order':order
+        'order':order,
+        'order_products':order_products
     }
     return render(request,'admins/order_details_admin.html',context)
+
+def coupons(request):
+    coupons=Coupons.objects.all()
+    context={
+        'coupons':coupons
+    }
+    return render(request,'admins/coupons.html',context)
+
+def add_coupons(request):
+    
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        discount = request.POST.get('discount')
+        valid_from = request.POST.get('valid_from')
+        valid_to = request.POST.get('valid_to')
+        coupon_count = request.POST.get('coupon_count')
+        minimum_amount = request.POST.get('minimum_amount')
+        maximum_discount = request.POST.get('maximum_discount')
+        status = request.POST.get('status')
+
+        # Create a new coupon object with the form data
+        coupon = Coupons(
+            name=name,
+            discount=discount,
+            valid_from=valid_from,
+            valid_to=valid_to,
+            coupon_count=coupon_count,
+            minimum_amount=minimum_amount,
+            maximum_discount=maximum_discount,
+            status=(status == 'on'),  # Convert 'on' to True for checkbox value
+                    )            
+        coupon.save()
+        return redirect('coupons')
+    return render(request,'admins/add_coupons.html')
+
+def edit_coupons(request,coupon_id):
+    coupon=get_object_or_404(Coupons,id=coupon_id)
+    coupon_form=None
+    if request.method=='POST':
+        coupon_form =CouponsForm(request.POST, instance=coupon)
+        if coupon_form.is_valid():
+            print('entered')
+            print(coupon.status)
+            coupon_form.save()
+            # Redirect or do something else after successful form submission
+            return redirect('coupons')
+    else:
+        coupon_form = CouponsForm(instance=coupon)  # Initialize form with the coupon instance
+    
+    context = {
+        'coupon_form': coupon_form,
+        'coupon': coupon
+    }
+        
+    context={
+        'coupon_form':coupon_form,
+        'coupon':coupon
+    }    
+        
+    return render(request,'admins/edit_coupons.html',context)
+
+def delete_coupons(request,coupon_id):
+    try:
+        coupon=Coupons.objects.get(id=coupon_id)
+        coupon.delete()
+    except:
+        pass
+    return redirect('coupons')    
+
+def profiles(request,customer_id):
+    us=Acount.objects.get(id=customer_id)
+    print(us)
+    user=None
+    try:
+        user=UserProfile.objects.get(user=us)
+        print('ok',user)
+        context={
+        'user':user
+        }
+        return render(request,'admins/profiles.html',context)
+    except :
+        user=None
+        context={
+        'user':user
+        }
+        return render(request,'admins/profiles.html',context)
+  
+    
+    
         
 
      

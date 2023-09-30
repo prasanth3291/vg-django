@@ -50,7 +50,7 @@
                                 <div class="item-option-select" style="position: relative; z-index:2">
                                     <h6>Choose Color</h6>
                                     <select name="color" class="form-control" id="color-select" required onchange="updateSizeOptions()">
-                                        <option value="" disabled selected></option>
+                                        <option value=""selected>{{color.first}}</option>
                                         {% for color in unique_color %}
                                             <option value="{{ color }}">{{ color }}</option>
                                         {% endfor %}
@@ -63,6 +63,7 @@
                                     <div id="size-options-container">
                                         <!-- Size options will be inserted here dynamically -->
                                         <select name="size" class="form-control" id="size-select" required onchange="updatePrice()">
+                                            
                                             <!-- Options for sizes will be inserted here dynamically -->
                                         </select>
                                     </div>
@@ -72,14 +73,43 @@
                             {% if oos %}
                                 <h4 class="oos" style="color:red">Product out of stock</h4>
                             {% else %}
+                        <div style="display: flex;">
+                                    <div style="padding-right: 5px;">
+                                        <button type="submit" class="btn btn-primary">
+                                            <span class="text">Add to cart</span>
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                            {% endif %}
+                            
+                            </form>
+                            {% if user.is_authenticated %}
+                            <form action="{% url 'add_wish_list' single_product.id %} " method="get">
+                                
+                                <input type="hidden" name="next" value="{{ request.path }}">
                                 <div style="padding-right: 5px;">
-                                    <button type="submit" class="btn btn-primary">
-                                        <span class="text">Add to cart</span>
-                                        <i class="fas fa-shopping-cart"></i>
+                                    <button type="submit"{% if single_product in wish_list_products %} class="btn btn-danger"
+                                     {% else %} class="btn btn-light" {% endif %}>
+                                    
+                                    <i class="fa fa-heart" aria-hidden="true"></i>
                                     </button>
                                 </div>
+                            </form>
+                            {% else %}
+                            <form action="{% url 'add_wish_list' single_product.id %} " method="get">
+
+                                
+                                <input type="hidden" name="next" value="{{ request.path }}">
+                                <div style="padding-right: 5px;">
+                                    
+                                    <button type="submit" class="btn btn-light">
+                                    
+                                    <i class="fa fa-heart" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </form>
                             {% endif %}
-                        </form>
+                        </div>
                     </article>
                 </main>
             </div>
@@ -147,6 +177,7 @@
         const colorSelect = document.getElementById('color-select');
         const sizeSelect = document.getElementById('size-select');
         const selectedColor = colorSelect.value;
+        
 
         // Fetch the available sizes for the selected color from your JavaScript object
         const sizesForColor = sizesByColor[selectedColor] || [];
@@ -195,5 +226,19 @@
                 console.error('Error fetching price:', error);
             });
     }
+     // Set the default selected options for color and size
+     window.addEventListener('DOMContentLoaded', function () {
+        const colorSelect = document.getElementById('color-select');
+        const sizeSelect = document.getElementById('size-select');
+
+
+        // Set the first option as the default selected option for both color and size
+        colorSelect.selectedIndex = 1;
+        sizeSelect.selectedIndex = 0;
+
+        // Call updateSizeOptions to update the size options based on the default selected color
+        updateSizeOptions();
+    });
         </script>
+        
 {% endblock %}

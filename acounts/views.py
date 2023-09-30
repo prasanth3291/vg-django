@@ -1,11 +1,13 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from .forms import RegistrationForms,UserForm,UserProfileForm,AdressForm
-from.models import Acount,UserProfile,Adress,Coupons
+from.models import Acount,UserProfile,Adress,Coupons,Wishlist
 from django.contrib import messages,auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate,login as auth_login
 from django.shortcuts import HttpResponse
 from orders.models import Order,Payment,OrderProduct
+from store.models import Product,Variation
+import urllib.parse
 
 # user verification
 from django.contrib.sites.shortcuts import get_current_site
@@ -100,12 +102,8 @@ def login(request):
         user=request.user
         if user.is_superadmin:
                 return render(request,'admins/dashboard.html')
-        else:
-            
-       
-            
-            return redirect ('user_dashboard')
-    
+        else:            
+            return redirect ('user_dashboard')    
     
     if request.method == 'POST':
         email = request.POST['email']
@@ -159,20 +157,32 @@ def login(request):
             else:
                 messages.success(request,'User Successfully signed in')
                 url=request.META.get('HTTP_REFERER')
+                print('url=',url)
+                next_url = request.GET.get('next')
+                print('next',next_url)
                 try:
                     query=requests.utils.urlparse(url).query
+                  #  next_url = request.GET.get('next', 'wish_list')
+                   # print(next_url)
                     
                     if query:
                         print('qry-->',query)
                         # we will split qry
-                        params=dict(x.split('=') for x in query.split('&') )
-                        if 'next' in params:
-                            
+                        params=dict(x.split('=') for x in query.split('&') )    
+                        
+                        # this is for wishlist                        
+                        url_value=params['next']      
+                        if 'add_wish_list' in url_value:            
+                            parsed_url = urllib.parse.urlparse(url)                           
+                            print(parsed_url)
+                            next_param = urllib.parse.unquote(parsed_url.query.split('=')[1])                          
+                            return  redirect(next_param)
+                                         
+                        elif 'next' in params:                            
                             nextPage=params['next']
                             print('ne',nextPage)
                             return redirect(nextPage)
-                        else:
-                            print('here first') 
+                        else:                        
                             return redirect ('user_dashboard')
                     else:
                         return redirect('user_dashboard')    
@@ -429,6 +439,48 @@ def coupons(request):
         'user_coupons':user_coupons
     }
     return render(request,'acounts/coupons.html',context)
+
+# the method to implement wishlist
+@login_required(login_url='login')
+def add_wish_list(request, product_id=None):
+    next_url = request.GET.get('next', 'wish_list')
+    user = request.user
+    product = get_object_or_404(Product, id=product_id)
+    print('nu=',next_url)
+    
+    url=request.META.get('HTTP_REFERER')
+    print('url=',url)
+    
+    # Check if the product is already in the user's wishlist
+    if Wishlist.objects.filter(user=user, products=product).exists():
+        Wishlist.objects.filter(user=user, products=product).delete()
+    else:
+        variations = Variation.objects.filter(product=product)
+        variation = variations.first()
+        Wishlist.objects.create(
+            user=user,
+            products=product,
+            variation=variation,
+        )
+
+    return redirect(next_url)
+
+    
+            
+@login_required(login_url='login')        
+def wish_list(request):    
+    if request.user.is_authenticated:    
+        user=request.user
+        wish_lists=Wishlist.objects.filter(user=user)
+        context={
+        'wish_lists':wish_lists
+            }
+        return render(request,'acounts/wishlist.html',context)
+    
+            
+
+    
+    
 
     
             

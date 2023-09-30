@@ -1,0 +1,77 @@
+{% extends 'admins/base.html' %}
+
+{% block content %}
+
+<section class="section-conten padding-y bg" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
+    <div class="container mt-3">
+        {% include 'includes/alerts.html' %}
+        <div class="row">    
+        <main class="col-md-12 m-3"> 
+            <div class="d-flex justify-content-end" style="margin-right: 100px;"> <!-- Use a flex container for alignment -->
+                <a href="{% url 'add_coupons' %}" class="btn btn-primary me-3">Add coupon</a>
+            </div>
+            <div class="card-header">
+                <h6>Coupons</h6>
+              
+          
+            <table class="table bg-white">
+                <thead>
+                  <tr class="tr bg-info">
+                    <th scope="col">#</th>
+                    <th scope="col">Code</th>
+                    <th scope="col">Discount</th>
+                    <th scope="col">Valid from</th>
+                    <th scope="col">Valid to</th>
+                    <th scope="col">Min.Purchase <br> amount</th>
+                    <th scope="col">Maximum <br> discount</th>
+                    <th scope="col">Number</th>
+                    <th scope="col">Status</th>
+                    <th scope='col'>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for coupon in coupons %}
+                  <tr>
+                    
+                    <th scope="row">{{coupon.id}}</th>
+                    <td><a href="{% url 'edit_coupons' coupon.id %}">{{coupon.name}}</a></td>
+                    <td>{{coupon.discount}}</td>
+                    <td>{{coupon.valid_from}}</td>
+                    <td>{{coupon.valid_to}}</td>
+                    <td>{{coupon.minimum_amount}}</td>
+                    <td>{{coupon.maximum_discount}}</td>
+                    <td>{{coupon.coupon_count}}</td>
+                    <td> {% if coupon.status %}
+                        <span style="border-radius: 50%;padding: 8px;background-color: green;color: white;">&#10004;</span>  <!-- Green checkmark if active -->
+                    {% else %}
+                        <span style="border-radius: 50%;padding: 8px;background-color: red;color: white;">&#10008;</span>  <!-- Red "X" mark if not active -->
+                    {% endif %}</td>
+                    <td><a href="{% url 'delete_coupons' coupon.id %}" class="btn btn-danger m-0 p-1" 
+                        onclick="return confirm('Ares you sure you want delete this item')">Delete</a></td>
+                
+                  </tr>
+                  {% endfor %}
+                  
+                </tbody>
+              </table>
+
+            </div>
+                  
+            
+            <div class="card-body">              
+                
+              
+
+                </div> <!-- row.// -->
+            </div> <!-- card-body .// -->
+         
+            </article> <!-- order-group.// --> 
+        </main>
+    </div> <!-- row.// -->
+    </div>
+    
+    
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+
+{% endblock %}

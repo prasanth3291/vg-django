@@ -33,6 +33,7 @@ def payments(request,order_number):
     payment.save()
     order.payment=payment
     order.is_ordered=True
+    order.status='Accepted'
     order.save()
     print("payment")
      #  ove the cart items to the order product table
@@ -104,14 +105,12 @@ def place_order(request,total=0,quantity=0):
     coupon_discount=0
     # here we will check any coupons applied still active
     try:        
-        user_coupon=UserCoupons.objects.get(user=request.user,applied=True,is_active=True)
-        print('siccess')
+        user_coupon=UserCoupons.objects.get(user=request.user,applied=True,is_active=True)        
     except:
         pass
     # if coupon aplly discount    
     if user_coupon:   
-        coupon_discount=user_coupon.coupon.discount 
-        
+        coupon_discount=user_coupon.coupon.discount         
     for cart_item in cart_items:
         if cart_item.variations.offer_price:
             price=cart_item.variations.offer_price
@@ -166,7 +165,7 @@ def place_order(request,total=0,quantity=0):
             d=datetime.date(yr,mt,dt)
             current_date=d.strftime('%Y%m%d')
             order_number=current_date+str(order1.id)
-            order1.order_number=order_number
+            order1.order_number=order_number            
             order1.save()
             order=Order.objects.get(user=current_user,is_ordered=False,order_number=order_number)    
             
@@ -252,13 +251,15 @@ def place_order(request,total=0,quantity=0):
     
     
 def cancel_order(request,order_number):   
-    order=get_object_or_404(Order,order_number=order_number,user=request.user)
+    try:
+        order=get_object_or_404(Order,order_number=order_number,user=request.user)
+    except: 
+        if request.user.is_admin:
+            order=order=get_object_or_404(Order,order_number=order_number )   
     payment=order.payment
     orpr=OrderProduct.objects.filter(order=order,payment=payment)
-    print(order)
     if request.method=='POST':    
-        if order.is_ordered:
-            print('3')  
+        if order.is_ordered:  
             orderproducts=OrderProduct.objects.filter(order=order)
             for or_product in orderproducts:
                 product=or_product.product
@@ -266,6 +267,7 @@ def cancel_order(request,order_number):
                 variation.stock += or_product.quantity
                 variation.save()
             order.is_ordered=False
+            order.status='Cancelled'
             order.save()  
         if payment:
             payment.status='Cancelled' 
@@ -273,11 +275,13 @@ def cancel_order(request,order_number):
         if orpr:
             for i in orpr:
                 i.ordered=False
-                i.save()       
-            
-            print('its ok')  
+                i.save()      
+            if request.user.is_admin:
+                return redirect('orders') 
+           
             return redirect('user_dashboard')
-                
+    if request.user.is_admin:
+                return redirect('orders')             
     return redirect('user_dashboard')    
 
 def order_complete(request):
@@ -295,6 +299,8 @@ def order_complete(request):
    
     try:
         order=Order.objects.get(order_number=order_number,is_ordered=True)
+        order.status='Completed'
+        order.save()
         order_products=OrderProduct.objects.filter(order_id=order.id)     
         payment=Payment.objects.get(payment_id=transID)     
         subtotal=order.order_total-order.tax   

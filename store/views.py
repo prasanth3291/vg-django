@@ -77,8 +77,7 @@ def product_detail(request,category_slug,Product_slug):
             oos=True   
     except:
         pass  
-    # end oos
-    
+    # end oos    
     for variation in single_product.variation_set.all():
         if variation.color.color_name not in unique_color:
             unique_color.add(variation.color.color_name)
@@ -89,6 +88,19 @@ def product_detail(request,category_slug,Product_slug):
                 size.add(variation.size.size)   
             unique_size[variation.color.color_name]=list(size)   
     print(unique_size)             
+    wish_list_products=[]
+    try:
+    
+        user=request.user
+        if user.is_authenticated:
+            
+            wish_list=user.wishlist_set.all()
+            for item in wish_list:
+                wish_list_products.append(item.products)
+
+    except:
+        pass            
+                 
             
     context={
         'single_product':single_product,
@@ -97,7 +109,8 @@ def product_detail(request,category_slug,Product_slug):
         'unique_color':unique_color,
         'unique_size':unique_size,
         'sizesByColor': json.dumps(unique_size),
-        'oos':oos
+        'oos':oos,
+        'wish_list_products':wish_list_products
     }
     
     return render(request,'store/product_detail.html',context)

@@ -22,6 +22,8 @@ urlpatterns = [
     path('edit_adress/<int:adress_id>/',views.edit_adress,name='edit_adress'),
     path('delete_adress/<int:adress_id>/',views.delete_adress,name='delete_adress'),
     path('coupons/',views.coupons,name='coupons'),
+    path('add_wish_list/<int:product_id>/',views.add_wish_list,name='add_wish_list'),
+    path('wish_list/', views.wish_list, name='wish_list'),
    
     
     

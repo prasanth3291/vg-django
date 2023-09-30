@@ -1,6 +1,9 @@
 from django.core.exceptions import ValidationError
 from store.models import Product
 from django import forms
+from acounts.models import Coupons
+
+
 
 
 class ProductForm(forms.ModelForm):
@@ -17,3 +20,20 @@ class ProductForm(forms.ModelForm):
             raise ValidationError("A product with this name already exists.")
 
         return product_name
+    
+    
+    
+class CouponsForm(forms.ModelForm):
+    valid_from = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))  # Use DateField for valid_from    
+    valid_to = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'})) 
+    status = forms.BooleanField(required=False)  # Use BooleanField for status
+
+    class Meta:
+        model=Coupons
+        fields=['name','discount','valid_from','valid_to','minimum_amount','maximum_discount','coupon_count','status'] 
+        
+        
+    def __init__(self,*args, **kwargs) :
+        super(CouponsForm,self).__init__(*args,**kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class']='form-control'    

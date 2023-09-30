@@ -114,6 +114,44 @@
             </aside> <!-- col.// -->
             <aside class="col-lg-6">
                 <div class="card">
+                    <div class="card-body">                        
+                               
+                            <form action="{% url 'checkout' %}" method="post">
+                                {% csrf_token %}                                
+                                <div class="row">
+                                    {% if discount_value %}
+                                    <h6 class="text-white btn btn-success m-2" >Coupon {{valid_coupon.name}} applied</h6>
+                                    {%else %}
+                                    <h6 style="padding-left: 10px;">You have any coupons?</h6>
+                                    
+                                    <div class="col-9 p-2">
+                                        <input type="text" id="coupon_code" name="coupon_code" class="form-control" placeholder="Enter coupon code">
+                                    </div>
+                                    <div class="col-3 p-2">
+                                        <button type="submit" class="btn btn-primary btn-block">Apply Coupon</button>
+                                    </div>  
+                                    
+                                    {% endif %}
+                                    {% if messages %}
+                                    {% for message in messages %}
+                                    {% if 'coupon' in message.tags %}
+
+                                        
+                                            <div class="address-error">
+                                                <p class="alert text-danger " style="font-size: large;font-weight: 900;font-family: 'Gill Sans', 'Gill Sans MT', Calibri,
+                                                'Trebuchet MS', sans-serif;">{{ message }}</p>
+                                            </div>
+                                            {% endif %} 
+                                    {% endfor %}
+                                {% endif %}                   
+                                </div>
+
+                                                                   
+                            </form>
+                            
+                    </div>
+                </div>
+                <div class="card">
                     <div class="card-body">
                         <table class="table table-borderless table-shopping-cart">
                             <thead class="text-muted">
@@ -189,7 +227,26 @@
     
                         <div class="card">
                         <div class="card-body" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">
-                            <dl class="dlist-align">
+                            {% if original_total != total %}
+                            <dl class="dlist-align text-primary" >
+                              <dt>Sub total:</dt>
+                              <dd class="text-right ">$ {{original_total}}</dd>
+                            </dl>
+                            {% endif %}
+                            {% if discount_value %}
+                            <dl class="dlist-align text-danger">
+                                <dt>Discount from Coupon:</dt>
+                                <dd class="text-right">- $ {{discount_value}}</dd>
+                              </dl>
+                              {% endif %}
+                              {% if offer_discount %}
+                              <dl class="dlist-align text-success">
+                                <dt>Discount from offer:</dt>
+                                <dd class="text-right">- $ {{offer_discount}}</dd>
+                              </dl>
+                              {% endif %}
+                              <hr>
+                              <dl class="dlist-align">
                               <dt>Total price:</dt>
                               <dd class="text-right">$ {{total}}</dd>
                             </dl>
@@ -197,38 +254,11 @@
                               <dt>Tax:</dt>
                               <dd class="text-right">${{tax}}</dd>
                             </dl>
-                            <dl class="dlist-align">
+                            <dl class="dlist-align text-primary">
                               <dt>Total:</dt>
-                              <dd class="text-right text-dark b"><strong>$ {{grand_total}}</strong></dd>
+                              <dd class="text-right text-primary b"><strong>$ {{grand_total}}</strong></dd>
                             </dl>
                             <hr>
-                            {% if used is True %}
-
-                            {% include 'includes/alerts.html' %}
-                            
-                            {% elif status is True %}
-
-                            <h6 style="text-align: center;color: rgb(57, 207, 230);">Coupon <span style="background-color: rgb(246, 96, 96);font-weight: bolder;"> {{valid_coupon.name}} </span></span>  applied, {{valid_coupon.discount}}% discount on total purchase</h6>
-                            {% else %}
-                            <form action="{% url 'checkout' %}" method="post">
-                                {% csrf_token %}
-                                
-                                <div class="row">
-                                    {% for coupon in coupons %}
-
-                                                
-                                                    <div class="col-9 p-2"  >
-                                                        <h5 class="text-center p-2" style="border-color: rgb(51, 49, 46);
-                                                        background-color: rgb(246, 249, 204);" >{{ coupon.name }}</h5></div>
-                                                    <div class="col-3 p-2" ><button type="submit" name="selected_coupon" 
-                                                        value="{{ coupon.id }}" class="btn btn-primary btn-block ">Apply Coupon</button>                                                                                                   
-                                                    </div>                     
-                                                                                   
-
-                                    {% endfor %}
-                                    {% endif %}
-                                </div>
-                            </form>
                             
                             
                         </div> <!-- card-body.// -->

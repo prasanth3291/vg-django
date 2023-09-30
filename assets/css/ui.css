@@ -2,6 +2,9 @@
 /* ==== BASE STYLES ====*/
 /* ==================== GLOBAL STYLES ======================= */
 @import url("https://rsms.me/inter/inter.css");
+
+
+
 html {
   font-family: "Inter", sans-serif;
   font-size: 15px;
@@ -18,9 +21,11 @@ a:hover {
 .img-wrap {
   text-align: center;
   display: block;
+  
 }
 .img-wrap img {
   max-width: 100%;
+  
 }
 
 .icon-wrap {

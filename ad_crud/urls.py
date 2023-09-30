@@ -17,6 +17,11 @@ urlpatterns = [
     path('delete_category/<int:cat_id>/',views.delete_category,name="delete_category"),
     path('order_details_admin/<int:order_id>/',views.order_details_admin,name='order_details_admin'),    
     path('orders',views.orders,name='orders'),
+    path('coupons',views.coupons,name='coupons'),
+    path('add_coupons',views.add_coupons,name='add_coupons'),
+    path('edit_coupons/<int:coupon_id>/',views.edit_coupons,name='edit_coupons'),    
+    path('delete_coupons/<int:coupon_id>/',views.delete_coupons,name='delete_coupons'),    
+    path('profiles/<int:customer_id>/',views.profiles,name='profiles')
 
 
     

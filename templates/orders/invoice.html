@@ -23,13 +23,26 @@
             padding: 8px;
             text-align: left;
         }
+       
     </style>
 </head>
 <body>
     <h1>Invoice</h1>
-    <p>Invoice Number: {{ invoice_number }}</p>
-    <p>Date: {{ invoice_date }}</p>
-    <p>Customer: {{ customer_name }}</p>
+    <div class="header" style="justify-content: space-between;display: flex;width:50;background-color: aquamarine;">
+        <div class="header-left">
+            <p>Invoice Number: {{ invoice_number }}</p>
+            <p>Date: {{ invoice_date }}</p>
+            <p>Customer: {{ customer_name }}</p>
+        </div>
+        <div class="header-right" style="width: 50%;"background-color: blue;">
+            <p>Invoice Number: {{ invoice_number }}</p>
+            <p>Date: {{ invoice_date }}</p>
+            <p>Customer: {{ customer_name }}</p>
+            <!-- Add any content you want on the right side of the header here -->
+        </div>
+    </div>
+
+    
 
     <table>
         <thead>

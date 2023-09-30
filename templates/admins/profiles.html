@@ -1,0 +1,46 @@
+{% extends 'admins/base.html' %}
+
+
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+          {% if user %}
+            <div class="card" style="width: 18rem;">
+                <img class="card-img-top" src="{{user.profile_picture.url}}" alt="Card image cap">
+                <div class="card-body">
+                  <h5 class="card-title">{{user.user.first_name}}</h5>
+                  <p class="card-text">{{user.user.email}}</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">{{user.user.username}}</li>
+                  <li class="list-group-item">{{user.adress_line1}}</li>
+                  <li class="list-group-item">{{user.adress_line2}}</li>
+                </ul>
+                <div class="card-body">
+                  <a href="#" class="card-link">{{user.phone_number}}</a>
+                  <a href="#" class="card-link">Another link</a>
+                </div>
+              </div>
+            
+
+        </div>
+        {% else %}
+
+        <h6>Profile not completed</h6>
+        {% endif %}
+    </div>
+</div>
+
+
+
+
+
+
+
+           
+
+
+{% endblock %}

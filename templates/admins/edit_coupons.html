@@ -1,0 +1,75 @@
+{% extends 'admins/base.html' %}
+
+{% block content %}
+
+<div class="container" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
+    {% include 'includes/alerts.html' %}
+    <div class="row">
+       
+    <main class="col-md-9">
+        <article class="card">
+        <header class="card-header">
+            <strong class="d-inline-block mr-3">Edit Coupons</strong>
+            
+        </header>
+        <div class="card-body">            
+            <div class="row">                 
+                <div class="col md-12">
+                    <form action="{% url 'edit_coupons' coupon.id %}" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label >Coupon code</label>
+                                {{coupon_form.name}}
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label >Discount</label>
+                                {{coupon_form.discount}}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label >Valid rom</label>
+                                {{coupon_form.valid_from}}
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label >Valid to</label>
+                                {{coupon_form.valid_to}}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label >Minnimum Purchase amount</label>
+                                {{coupon_form.minimum_amount}}
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label >Maximum discount</label>
+                                {{coupon_form.maximum_discount}}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label >Stock</label>
+                                {{coupon_form.coupon_count}}
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Status</label>
+                                <select name="status" class="form-control" required>
+                                    <option value='True' {% if coupon.status %}selected="selected"{% endif %}>Yes</option>
+                                    <option value='False' {% if not coupon.status %}selected="selected"{% endif %}>No</option>
+                                </select>
+                            </div>
+                            
+                        </div>
+                        <input type="submit" value="Save" class="btn btn-primary">                           
+                    </form>
+                   
+                </div>
+            </div>
+
+        </div> <!-- card-body .// -->
+        </div>
+        </div>
+       
+        
+        {% endblock %}

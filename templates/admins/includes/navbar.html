@@ -1,6 +1,6 @@
 {% load static %}
-<div class="sidebar pe-4 pb-3 ps-2">
-    <nav class="navbar bg-light navbar-light">
+<div class="sidebar pe-4 pb-3 ps-2" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
+    <nav class="navbar bg-light navbar-primary">
         <a href="index.html" class="navbar-brand mx-4 mb-3">
             <h3 class="text-success">Vogue Villa</h3>
         </a>
@@ -25,13 +25,13 @@
             <hr>
             <a href="{% url 'ad_category' %}" class="nav-item nav-link py-0">Catagory</a>
             <hr>
-            <a href="chart.html" class="nav-item nav-link py-0">Coupons</a>
+            <a href="{% url 'coupons' %}" class="nav-item nav-link py-0">Coupons</a>
             <hr>
             <a href="{% url 'logout' %}"  class="btn btn-success py-0" >Logout</a>
         </div>
     </nav>
 </div>
-<div class="content">
+<div class="content" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
     <!-- Navbar Start -->
     <nav class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0">
         <a href="index.html" class="navbar-brand d-flex d-lg-none me-4">
@@ -51,8 +51,8 @@
                     <span class="d-none d-lg-inline-flex">{{user.first_name}}</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
-                    <a href="#" class="dropdown-item">My Profile</a>
-                    <a href="#" class="dropdown-item">Settings</a>
+                 <!-- #region   <a href="#" class="dropdown-item">My Profile</a>
+                    <a href="#" class="dropdown-item">Settings</a>--> 
                     <a href="{% url 'logout' %}" class="dropdown-item">Log Out</a>
                 </div>
             </div>

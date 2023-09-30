@@ -3,7 +3,7 @@
 {% block content %}
 
 
-<div class="container">
+<div class="container mt-3" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
     <div class="table-wrapper">
         <div class="table-title">
             <div class="row">
@@ -13,8 +13,8 @@
       
             </div>
         </div>
-        <table class="table table-striped table-hover">
-            <thead>
+        <table class="table table-white table-hover" >
+            <thead class="bg-info">
                 <tr>
       
                     
@@ -32,7 +32,7 @@
                 
                 <tr>
                       
-                    <td><a href="#">{{customer.email}}</a></td>
+                    <td><a href="{% url 'profiles' customer.id %}" style="text-decoration: none;">{{customer.email}}</a></td>
                     <td>{{customer.first_name}}</td>
                     <td>{{customer.username}}</td>
                     <td>{{customer.last_login}}</td>
@@ -67,7 +67,7 @@
 <!-- Modal for Delete Confirmation -->
 {% for i in customers %}
 <!-- Delete Modal HTML -->
-<div id="deleteEmployeeModal-{{forloop.counter}}" class="modal fade">
+<div id="deleteEmployeeModal-{{forloop.counter}}" class="modal fade" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
   <div class="modal-dialog">
     <div class="modal-content">
       <form>
