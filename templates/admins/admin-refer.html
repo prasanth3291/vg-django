@@ -22,49 +22,31 @@
             <thead  style="background-color: rgb(173, 243, 243);">
                 <tr>
                     
-                    <th>Order number</th>
-                    <th>Full name</th>
-                    <th>Email</th>
-                    <th>Total order</th>
-                    <th>Payment</th>                   
-                    <th>Status</th>
+                    <th>code</th>
+                    <th>Referrer</th>
+                    <th>User</th>
+                    <th>Reward</th>
+                    <th>Status</th>                   
+                    
                     
                     
                 </tr>
             </thead>
             <tbody>
-                {% for order in orders %}
-                
+                {% for code in codes %}
                 <tr>
-                    
-                   
-                    <td><a href="{% url 'order_details_admin' order.id %}" style="text-decoration: none;">{{ order.order_number }}</a></td>
-                    <td>{{ order.full_name }}</td>
-                    <td>{{ order.email }}</td>
-                    <td>{{ order.order_total }}</td>
-                    <td>{{ order.payment.payment_method }}</td>
-                    <td>
-                        {% if order.is_ordered %}
-                            <h6 style="color: green;">Successfull</h6>
-                        {% elif order.status == 'Cancelled' %}
-                            <h6 style="color: red;">{{order.status}}</h6>
-                        {% else %}
-                        <h6 style="color: rgb(31, 200, 247);">{{order.status}}</h6>
+                    <td>{{ code.code }}</td>
+                    <td>{{ code.referrer_user }}</td>
+                    <td>{{ code.referred_user }}</td>
+                    <td>{{ code.gift_money }}</td>
+                    <td>{% if code.is_activated %}<i class="fas fa-check-circle" style="color: #09fb66;"></i>
+                        {% else %}<i class="fa fa-times-circle" aria-hidden="true" style="color: red;"></i>
+                        {% endif %}</td>
 
-                        {% endif %}
-                    </td>
-
-                </tr>
-                
+                </tr>                
                 
                 {% endfor %}
 
-                  <!-- #region <td>
-                        
-                        <a href="#deleteEmployeeModal-{{forloop.counter}}" class="delete btn btn-danger" data-toggle="modal">Cancel</a>
-                    </td> --> 
-          
-               
 
             </tbody>
         </table>

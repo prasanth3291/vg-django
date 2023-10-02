@@ -21,7 +21,8 @@ urlpatterns = [
     path('add_coupons',views.add_coupons,name='add_coupons'),
     path('edit_coupons/<int:coupon_id>/',views.edit_coupons,name='edit_coupons'),    
     path('delete_coupons/<int:coupon_id>/',views.delete_coupons,name='delete_coupons'),    
-    path('profiles/<int:customer_id>/',views.profiles,name='profiles')
+    path('profiles/<int:customer_id>/',views.profiles,name='profiles'),
+    path('ad_refer',views.ad_refer,name='ad_refer')
 
 
     

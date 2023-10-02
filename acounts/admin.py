@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from.models import Acount,UserProfile,Adress,Coupons,Wishlist
+from.models import Acount,UserProfile,Adress,Coupons,Wishlist,Referal_code
 from django.utils.html import format_html 
 from django.utils import timezone
 
@@ -31,8 +31,12 @@ class CouponsAdmin(admin.ModelAdmin):
     
     #actions=[aplly_WL30,aplly_ING40]   
     
+class Referal_codeAdmin(admin.ModelAdmin):
+    list_display=('code','referrer_user','referred_user','gift_money','is_activated')    
     
-
+    
+    
+admin.site.register(Referal_code,Referal_codeAdmin)
 admin.site.register(Acount,AcountAdmin)
 admin.site.register(UserProfile,UserProfileAdmin)
 admin.site.register(Adress)

@@ -14,26 +14,28 @@
             <header class="mb-4"><h4 class="card-title">Sign up</h4></header>
             <form  action="{% url 'register' %}" method="POST">
                 {% csrf_token %}
-                    <div class="form-row">
-                        <div class="col form-group">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
                             <label>First name</label>
                              {{form.first_name}}
                         </div> <!-- form-group end.// -->
-                        <div class="col form-group">
+                        <div class="col form-group col-md-6">
                             <label>Last name</label>
-                              {{form.last_name}}
+                             <label> {{form.last_name}}</label>
                         </div> <!-- form-group end.// -->
                     </div> <!-- form-row end.// -->
-                    <div class="form-group">
-                        <label>{{form.email}}</label>
-                        
-                        <small class="form-text text-muted">We'll never share your email with anyone else.</small>
-                    </div> <!-- form-group end.// -->
+                   
                     <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Email</label>
+                            {{form.email}}
+                            <small class="form-text text-muted">We'll never share your email with anyone else.</small>
+                        </div> <!-- form-group end.// --> 
                         <div class="form-group col-md-6">
                             <label>Phone Number</label>
                             {{form.phone_number}}
                         </div> <!-- form-group end.// --> 
+                    </div> <!-- form-row end.// -->
                   
                     
                     <div class="form-row">
@@ -45,7 +47,14 @@
                             <label>confirm password</label>
                             {{form.confirm_password}}
                         </div> <!-- form-group end.// -->  
-                    
+                    </div> <!-- form-row end.// -->   
+                    <div class="form-row">
+                        <div class="form-group col-md-4 mx-auto">
+                            <small class="form-text text-muted text-center">Have any refferal code?</small>                           
+                            {{form.reference_code}}
+                        </div> <!-- form-group end.// --> 
+                    </div> <!-- form-row end.// -->      
+
                     <div class="form-group col-md-12">
                         <button type="submit" class="btn btn-primary btn-block"> Register  </button>
                     </div> <!-- form-group// -->      

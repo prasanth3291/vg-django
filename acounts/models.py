@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
 from twilio.rest import Client
 from store.models import Product,Variation
-
+import random,string
 
 class MyacountManager(BaseUserManager):
     def create_user(self,first_name,last_name,username,email,password=None):
@@ -41,18 +41,23 @@ class MyacountManager(BaseUserManager):
 
 
 class Acount(AbstractBaseUser):
-    first_name    = models.CharField( max_length=50)
-    last_name     = models.CharField( max_length=50)
-    username     = models.CharField(max_length=50,unique=True)
-    email         = models.EmailField( max_length=254,unique=True)
-    phone_number  = models.CharField(max_length=50)
+    first_name = models.CharField( max_length=50)
+    last_name = models.CharField( max_length=50)
+    username = models.CharField(max_length=50,unique=True)
+    email = models.EmailField( max_length=254,unique=True)
+    phone_number = models.CharField(max_length=50)
+    wallet_money=models.IntegerField(default=0)
+    referal_code=models.CharField( max_length=10,blank=True,null=True)
+    
+    
+    
     
 # required fields as its custome user model
-    date_joined   = models.DateTimeField(auto_now_add=True)
-    last_login    = models.DateTimeField(auto_now_add=True)
-    is_admin      = models.BooleanField(default=False)
-    is_staff      = models.BooleanField(default=False)
-    is_active     = models.BooleanField(default=False)
+    date_joined  = models.DateTimeField(auto_now_add=True)
+    last_login = models.DateTimeField(auto_now_add=True)
+    is_admin = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
     is_superadmin = models.BooleanField(default=False)
     
     USERNAME_FIELD='email'
@@ -117,6 +122,33 @@ class Wishlist(models.Model):
     added_at=models.DateField(auto_now_add=True)
     def __str__(self):
          return f"{self.user.username}'s Wishlist Item: {self.products.product_name}  "
+     
+# create a random code
+def generate_unique_referral_code():
+    # Generate a random code of 5 or 6 characters
+    code_length = 6
+    characters = string.ascii_letters + string.digits
+    code = ''.join(random.choice(characters) for _ in range(code_length))
+
+    # Check if the generated code is unique
+    while Referal_code.objects.filter(code=code).exists():
+        code = ''.join(random.choice(characters) for _ in range(code_length))
+
+    return code
+     
+     
+class Referal_code(models.Model):
+    code=models.CharField( max_length=6,unique=True,default=generate_unique_referral_code)   
+    referrer_user = models.ForeignKey(Acount, on_delete=models.CASCADE, related_name='referral_code_given')
+    referred_user = models.ForeignKey(Acount, on_delete=models.CASCADE, blank=True, null=True, related_name='referral_code_received')  
+    gift_money=models.IntegerField()
+    is_activated=models.BooleanField(default=False) 
+       
+    
+    def __str__(self):
+        return self.code
+     
+   
 
 
     

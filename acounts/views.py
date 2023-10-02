@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from .forms import RegistrationForms,UserForm,UserProfileForm,AdressForm
-from.models import Acount,UserProfile,Adress,Coupons,Wishlist
+from.models import Acount,UserProfile,Adress,Coupons,Wishlist,Referal_code
 from django.contrib import messages,auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate,login as auth_login
@@ -39,6 +39,7 @@ def register(request):
     if request.method=='POST':
         form=RegistrationForms(request.POST)
         if form.is_valid():
+            print("form valid")
             first_name=form.cleaned_data['first_name']            
             last_name=form.cleaned_data['last_name']        
             phone_number=form.cleaned_data['phone_number']            
@@ -47,8 +48,17 @@ def register(request):
             username=email.split('@')[0]        
             user=Acount.objects.create_user(first_name=first_name,last_name=last_name,email=email,username=username,password=password)
             user.phone_number=phone_number
-            user.save()
-            # acount activation
+            user.save()            
+            # check for referal codes
+            try:
+                reference_code=form.cleaned_data['reference_code']
+                user.referal_code=reference_code
+                user.save()
+                
+            except :
+                pass        
+                    
+           # acount activation
             token=default_token_generator.make_token(user)
             current_site=get_current_site(request)
             mail_subject='please activate your acount'
@@ -63,10 +73,10 @@ def register(request):
             send_email=EmailMessage(mail_subject,message,to=[to_email])
             
             
-            #new
+            # check otp verification
             otp=generate_random_otp()
             account_sid = "ACd61c3ec36ca81a50af865490b6342a4a"
-            auth_token = "ec37d52f13ccb00c5f40188b9a01ba36"
+            auth_token = "2a75a7a5927abe689856fc537db4ffd5"
             client = Client(account_sid, auth_token)
             message = client.messages \
                 .create(
@@ -86,6 +96,7 @@ def register(request):
             # messages.success(request,'Thank you for regestering with us,we have sent an verification link to your Email adress.Please verify it..')
             return redirect ('/acounts/login/?command=verification&email='+email)
     else:
+        print("form not valid")
         form=RegistrationForms()        
     
     context={
@@ -217,7 +228,23 @@ def activate(request,uidb64,token):
         user.save()
         messages.success(request,'Congratulations Your Acount is activated')   
         UserProfile.objects.create(user=user) 
-        return redirect('login')
+        # try for any referal codes
+        try:
+                reference_code=user.referal_code
+                code=Referal_code.objects.get(code=reference_code)                
+                if code:                   
+                    code.referred_user=user   
+                    code.is_activated=True
+                    code.save()           
+                    money=code.gift_money
+                    user.wallet_money +=money
+                    user.save()
+                    referrer=code.referrer_user
+                    referrer.wallet_money+=money
+                    referrer.save()                    
+        except Referal_code.DoesNotExist:                
+                pass     
+        return redirect('login')    
     
     else:
         messages.error(request,'Invalid link')
@@ -477,6 +504,34 @@ def wish_list(request):
             }
         return render(request,'acounts/wishlist.html',context)
     
+def refer(request,email_id=None):
+    user=request.user
+    if request.method=='POST':
+        email=request.POST['email']
+        print(email)        
+        code=Referal_code.objects.create(
+            referrer_user=request.user,
+            gift_money=10
+        )
+        referal_code=code.code
+        # sen mail to referred person        
+        current_site=get_current_site(request)
+        mail_subject='Please click the below link to register your acount'
+        message=render_to_string('acounts/refer_link.html',{                                    
+                                    'domain':current_site,    
+                                    'code':code                                                                   
+                                })                               
+                                    
+        to_email=email
+        send_email=EmailMessage(mail_subject,message,to=[to_email])
+        send_email.send()
+        messages.success(request,f"Referal code sent to {email}",extra_tags='refer')
+        return redirect('refer')
+    else:
+        codes=Referal_code.objects.filter(referrer_user=user)
+                
+    
+    return render(request,'acounts/refer.html',{'codes':codes})
             
 
     

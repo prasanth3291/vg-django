@@ -24,6 +24,8 @@ urlpatterns = [
     path('coupons/',views.coupons,name='coupons'),
     path('add_wish_list/<int:product_id>/',views.add_wish_list,name='add_wish_list'),
     path('wish_list/', views.wish_list, name='wish_list'),
+    path('refer/<str:email_id>/', views.refer, name='refer'),
+    path('refer/', views.refer, name='refer'),
    
     
     

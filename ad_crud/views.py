@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.shortcuts import HttpResponse,get_object_or_404
-from acounts.models import Acount,Coupons,UserProfile
+from acounts.models import Acount,Coupons,UserProfile,Referal_code
 from store.models import Product,softdelete,NonDeleted
 from category.models import category
 from.form import ProductForm,CouponsForm
@@ -301,6 +301,9 @@ def profiles(request,customer_id):
         }
         return render(request,'admins/profiles.html',context)
   
+def ad_refer(request):
+    codes=Referal_code.objects.all()
+    return render(request,'admins/admin-refer.html',{'codes':codes})
     
     
         

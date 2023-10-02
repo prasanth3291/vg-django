@@ -25,25 +25,31 @@
         }
        
     </style>
+    <!-- Add Bootstrap CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<!-- Add Bootstrap JavaScript (jQuery and Popper.js are required dependencies) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </head>
 <body>
     <h1>Invoice</h1>
     <div class="header" style="justify-content: space-between;display: flex;width:50;background-color: aquamarine;">
+
         <div class="header-left">
             <p>Invoice Number: {{ invoice_number }}</p>
             <p>Date: {{ invoice_date }}</p>
             <p>Customer: {{ customer_name }}</p>
         </div>
-        <div class="header-right" style="width: 50%;"background-color: blue;">
+        <div class="header-right" style="position: absolute;left:550px">
             <p>Invoice Number: {{ invoice_number }}</p>
             <p>Date: {{ invoice_date }}</p>
             <p>Customer: {{ customer_name }}</p>
             <!-- Add any content you want on the right side of the header here -->
         </div>
     </div>
-
-    
-
     <table>
         <thead>
             <tr>
@@ -72,5 +78,7 @@
     </table>
 
     <p>Total Amount: {{ total_amount }}</p>
+
+  
 </body>
 </html>

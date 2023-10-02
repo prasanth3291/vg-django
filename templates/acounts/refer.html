@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten padding-y bg">
+    
+
+    <div class="container" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
+       
+        <div class="row">
+            {% include 'includes/dashboard_sidebar.html' %}
+        <main class="col-md-9">
+            <article class="card">
+            <header class="card-header">
+                <strong class="d-inline-block mr-3">Refer a friend</strong>
+                
+            </header>
+            <div class="card-body">                
+                        <form action="{% url 'refer'  %}" method="POST" >
+                            {% csrf_token %}   
+                
+                <div class="row"> 
+                     <div class="col md-12">                               
+                            <div class="form-row">   
+                                 <div class="form-group col-md-6">       
+                                    <small style="padding-left: 5px;margin: 2px;">Enter email</small>
+                                    <input type="email" name="email" placeholder="Enter email ID" class="form-control" required>                               
+                                </div>
+                                <div class="form-group col-md-2" style="padding-top: 22px;">                                
+                                    <input type="submit" value="Submit" class="btn btn-primary">
+                                </div>
+                            </div>
+                        </form>                       
+                    </div>
+                </div>   
+                {% if messages %}
+                            {% for message in messages %}
+                            {% if 'refer' in message.tags %}
+                            <div class="address-error">
+                                <p class="alert text-danger " style="font-size: large;font-weight: 900;font-family: 'Gill Sans', 'Gill Sans MT', Calibri,
+                                'Trebuchet MS', sans-serif;">{{ message }}</p>
+                            </div>
+                            {% endif %} 
+                            {% endfor %}
+                            {% endif %}    
+            </div> <!-- card-body .// -->            
+            </article> <!-- order-group.// --> 
+            <div class="card mt-3">
+            <table class="table text-center">
+                <thead style="background-color: rgb(143, 241, 241);">
+                  <tr>                    
+                    <th scope="col">Code</th>
+                    <th scope="col">Send to</th>
+                    <th scope="col">Registered</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for code in codes %}
+                    {% if code.is_activated %}
+                  <tr>                    
+                    <td class="text-dark" style="font-weight: bolder;">{{code}}</td>
+                    <td>{{code.referred_user}}</td>
+                    <td>{% if code.is_activated %}<i class="fas fa-check-circle" style="color: #09fb66;"></i>
+                    {% else %}<i class="fa fa-times-circle" aria-hidden="true" style="color: red;"></i>{% endif %}</td>
+                  </tr>
+                  {% endif %}
+                  {% endfor %}
+                
+                </tbody>
+              </table>
+            </div>
+        </main>
+    </div> <!-- row.// -->
+    
+    </div>
+    
+    
+    
+    </section>
+    
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+
+
+{% endblock %} 

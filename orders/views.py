@@ -10,6 +10,7 @@ import uuid
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 #new 
+from django.views import View
 from acounts.models import Adress
 import json
 from django.http import HttpResponse
@@ -17,6 +18,7 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa
 from io import BytesIO
 from django.contrib import messages
+
 # Create your views here.
 def payments(request,order_number):
     # Create a payment record
@@ -314,12 +316,86 @@ def order_complete(request):
         return render(request,'orders/order_confirmation.html',context)
     except (Payment.DoesNotExist , Order.DoedNotexist):
         return redirect('home')
+
+data = {
+	"company": "Dennnis Ivanov Company",
+	"address": "123 Street name",
+	"city": "Vancouver",
+	"state": "WA",
+	"zipcode": "98663",
+
+
+	"phone": "555-555-2345",
+	"email": "youremail@dennisivy.com",
+	"website": "dennisivy.com",
+	}    
     
+# render to pdf
+def render_to_pdf(template_src, context_dict={}):
+	template = get_template(template_src)
+	html  = template.render(context_dict)
+	result = BytesIO()
+	pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+	if not pdf.err:
+		return HttpResponse(result.getvalue(), content_type='application/pdf')
+	return None
 
-# weasy print generate pdf
+#Opens up page as PDF
+    
+class ViewPDF(View):
+	def get(self,request,order_id):
+        
+         order=Order.objects.get(id=order_id)
+         payment=order.payment
+         order_products=OrderProduct.objects.filter(order=order)    
+         grand_total=order.order_total
+         data = {
+        'invoice_number': order.order_number,
+        'invoice_date': payment.created_at,
+        'customer_name': order.full_name,      
+        'total_amount': payment.amount_paid,
+        'items':order_products,        
+        'order_total':order.order_total,
+        'tax':order.tax,
+        'grand_total':grand_total
+                    }
+         pdf = render_to_pdf('orders/invoice.html', data)
+         return HttpResponse(pdf, content_type='application/pdf')
 
-# views.py
+class DownloadPDF(View):
+    def get(self, request, order_id, *args, **kwargs):
+        # Fetch the order and related data
+        order = Order.objects.get(id=order_id)
+        payment = order.payment
+        order_products = OrderProduct.objects.filter(order=order)
+        grand_total = order.order_total
 
+        # Prepare data for the PDF template
+        data = {
+            'invoice_number': order.order_number,
+            'invoice_date': payment.created_at,
+            'customer_name': order.full_name,
+            'total_amount': payment.amount_paid,
+            'items': order_products,
+            'order_total': order.order_total,
+            'tax': order.tax,
+            'grand_total': grand_total,
+        }
+
+        # Render the PDF using your render_to_pdf function
+        pdf = render_to_pdf('orders/invoice.html', data)
+
+        # Create an HTTP response with the PDF content
+        response = HttpResponse(pdf.getvalue(), content_type='application/pdf')
+
+        # Set the Content-Disposition header to suggest a filename
+        filename = "Invoice_%s.pdf" % order.order_number
+        content = f"attachment; filename='{filename}'"
+        response['Content-Disposition'] = 'attachment; filename="invoice.pdf"'
+
+        return response
+    
+    
 
 def generate_invoice_pdf(request,order_id):
     # Get invoice data (replace with your data retrieval logic)
@@ -337,14 +413,19 @@ def generate_invoice_pdf(request,order_id):
         'tax':order.tax,
         'grand_total':grand_total
     }
+  
 
     # Render the HTML template with data
     template = get_template('orders/invoice.html')
     html = template.render(invoice_data)
+    
+     # Enable logging
+    pisa.showLogging()
 
     # Create a PDF response
-    pdf = BytesIO()
-    pisa.CreatePDF(BytesIO(html.encode('utf-8')), pdf)
+    pdf = BytesIO()    
+    pisa_status = pisa.CreatePDF(html, dest=pdf)
+    #pisa.CreatePDF(BytesIO(html.encode('utf-8')), pdf)
 
     response = HttpResponse(pdf.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="invoice.pdf"'

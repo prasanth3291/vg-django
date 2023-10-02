@@ -5,7 +5,7 @@ import uuid
 from django.conf import settings
 
 def save_pdf(params:dict):
-    template=get_template('pdf/invoice.html')
+    template=get_template('orders/invoice.html')
     html=template.render(params)
     response=BytesIO
     pdf=pisa.pisaDocument(BytesIO(html.encode('UTF-8')),response)
