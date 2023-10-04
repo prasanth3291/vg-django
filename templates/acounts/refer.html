@@ -25,6 +25,10 @@
                 <div class="row"> 
                      <div class="col md-12">                               
                             <div class="form-row">   
+                                <div class="form-group col-md-2 text-center" style="padding-top: 25px;">    
+                                           
+                                    <h3>{{referal_code}}</h3>
+                                </div>
                                  <div class="form-group col-md-6">       
                                     <small style="padding-left: 5px;margin: 2px;">Enter email</small>
                                     <input type="email" name="email" placeholder="Enter email ID" class="form-control" required>                               
@@ -40,7 +44,7 @@
                             {% for message in messages %}
                             {% if 'refer' in message.tags %}
                             <div class="address-error">
-                                <p class="alert text-danger " style="font-size: large;font-weight: 900;font-family: 'Gill Sans', 'Gill Sans MT', Calibri,
+                                <p class="alert text-info " style="font-size: large;font-weight: 500;font-family: 'Gill Sans', 'Gill Sans MT', Calibri,
                                 'Trebuchet MS', sans-serif;">{{ message }}</p>
                             </div>
                             {% endif %} 
@@ -63,7 +67,7 @@
                   <tr>                    
                     <td class="text-dark" style="font-weight: bolder;">{{code}}</td>
                     <td>{{code.referred_user}}</td>
-                    <td>{% if code.is_activated %}<i class="fas fa-check-circle" style="color: #09fb66;"></i>
+                    <td>{% if code.is_activated %}<i class="fas fa-check-circle" style="color: #038233;"></i>
                     {% else %}<i class="fa fa-times-circle" aria-hidden="true" style="color: red;"></i>{% endif %}</td>
                   </tr>
                   {% endif %}

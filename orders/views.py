@@ -317,19 +317,7 @@ def order_complete(request):
     except (Payment.DoesNotExist , Order.DoedNotexist):
         return redirect('home')
 
-data = {
-	"company": "Dennnis Ivanov Company",
-	"address": "123 Street name",
-	"city": "Vancouver",
-	"state": "WA",
-	"zipcode": "98663",
 
-
-	"phone": "555-555-2345",
-	"email": "youremail@dennisivy.com",
-	"website": "dennisivy.com",
-	}    
-    
 # render to pdf
 def render_to_pdf(template_src, context_dict={}):
 	template = get_template(template_src)

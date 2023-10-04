@@ -1,5 +1,5 @@
 from django import forms
-from .models import Acount,UserProfile,Adress,Referal_code
+from .models import Acount,UserProfile,Adress,Referal_code,ReviewRating
 
 class RegistrationForms(forms.ModelForm):
     password=forms.CharField(widget=forms.PasswordInput(attrs={'placeholder' : 'enter password'})) 
@@ -16,20 +16,6 @@ class RegistrationForms(forms.ModelForm):
         model=Acount
         fields=['first_name','last_name','email','password','phone_number']
     
-    def clean_reference_code(self):
-        code=None
-        # Get the reference code entered by the user
-        if self.cleaned_data.get('reference_code'):
-            code = self.cleaned_data.get('reference_code')
-            # Check if the reference code exists in the Referal_code model                
-            if not Referal_code.objects.filter(code=code).exists():
-                raise forms.ValidationError('Invalid reference code. Please check and try again.')          
-            
-         
-        
-        return code    
-        
-        
     def clean(self):
        cleaned_data=super(RegistrationForms,self).clean()    
        password=cleaned_data.get('password')
@@ -78,5 +64,10 @@ class AdressForm(forms.ModelForm):
     def __init__(self,*args, **kwargs) :
         super(AdressForm,self).__init__(*args,**kwargs)
         for field in self.fields:
-            self.fields[field].widget.attrs['class']='form-control'                         
+            self.fields[field].widget.attrs['class']='form-control'       
+            
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model=ReviewRating
+        fields=['subject','review','rating']                            
         

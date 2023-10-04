@@ -40,8 +40,8 @@
               {% if order.is_ordered %}
               <div class="row " style="margin: 5px;">
               <a href="{% url 'generate_invoice_pdf' order.id %}" class="btn btn-outline-primary">Download invoice</a>
-              <a class="btn btn-info" href="{% url 'pdf_view' order.id %}" target="_blank">View Invoice</a>
-					<a class="btn btn-info"  href="{% url 'pdf_download' order.id %}">Download Invoice</a>
+              <a class="btn btn-outline-primary ml-1" href="{% url 'pdf_view' order.id %}" target="_blank">View Invoice</a>
+					
             </div>
             
             <div class="row" style="margin: 5px;">

@@ -38,7 +38,18 @@ class MyacountManager(BaseUserManager):
         user.save(using=self._db)
         return user
         
+# create a random code
+def generate_unique_referral_code():
+    # Generate a random code of 5 or 6 characters
+    code_length = 6
+    characters = string.ascii_letters + string.digits
+    code = ''.join(random.choice(characters) for _ in range(code_length))
 
+    # Check if the generated code is unique
+    while Referal_code.objects.filter(code=code).exists():
+        code = ''.join(random.choice(characters) for _ in range(code_length))
+
+    return code
 
 class Acount(AbstractBaseUser):
     first_name = models.CharField( max_length=50)
@@ -47,11 +58,8 @@ class Acount(AbstractBaseUser):
     email = models.EmailField( max_length=254,unique=True)
     phone_number = models.CharField(max_length=50)
     wallet_money=models.IntegerField(default=0)
-    referal_code=models.CharField( max_length=10,blank=True,null=True)
-    
-    
-    
-    
+    Referal_code=models.CharField( max_length=6,unique=True,default=generate_unique_referral_code) 
+
 # required fields as its custome user model
     date_joined  = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now_add=True)
@@ -123,22 +131,11 @@ class Wishlist(models.Model):
     def __str__(self):
          return f"{self.user.username}'s Wishlist Item: {self.products.product_name}  "
      
-# create a random code
-def generate_unique_referral_code():
-    # Generate a random code of 5 or 6 characters
-    code_length = 6
-    characters = string.ascii_letters + string.digits
-    code = ''.join(random.choice(characters) for _ in range(code_length))
 
-    # Check if the generated code is unique
-    while Referal_code.objects.filter(code=code).exists():
-        code = ''.join(random.choice(characters) for _ in range(code_length))
-
-    return code
      
-     
+# refereal code mo     
 class Referal_code(models.Model):
-    code=models.CharField( max_length=6,unique=True,default=generate_unique_referral_code)   
+    code=models.CharField( max_length=6)   
     referrer_user = models.ForeignKey(Acount, on_delete=models.CASCADE, related_name='referral_code_given')
     referred_user = models.ForeignKey(Acount, on_delete=models.CASCADE, blank=True, null=True, related_name='referral_code_received')  
     gift_money=models.IntegerField()
@@ -147,6 +144,37 @@ class Referal_code(models.Model):
     
     def __str__(self):
         return self.code
+    
+class ReviewRating(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)     
+    user = models.ForeignKey(Acount,on_delete=models.CASCADE)   
+    subject = models.CharField( max_length=100,blank=True)
+    review = models.TextField(max_length=500,blank=True)
+    rating = models.FloatField()
+    ip = models.CharField( max_length=20,blank=True)
+    status = models.BooleanField(default=True)
+    created_at = models.DateTimeField( auto_now_add=True)
+    updated_at = models.DateTimeField( auto_now=True)  
+    def __str__(self):
+        return self.subject    
+    
+    
+    
+class Wallet(models.Model):
+    user = models.OneToOneField(Acount, on_delete=models.CASCADE)    
+    balance = models.DecimalField( max_digits=10, decimal_places=2,default=0)
+    def __str__(self):
+        return f"{self.user.username}'s wallet"
+    
+class Transaction(models.Model):
+    Wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)     
+    amount = models.DecimalField( max_digits=10, decimal_places=2)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    description = models.CharField(max_length=250,blank=True)  
+    
+    def __str__(self):
+        return f"Transaction for {self.wallet.user.username} - {self.amount}"
+
      
    
 

@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models.query import QuerySet
 from category.models import category,Sub_category
 from django.urls import reverse
+from django.db.models import Avg,Count
 
 
 
@@ -82,18 +83,23 @@ class Product(softdelete):
     
     
     def __str__(self):
-        return self.product_name
+        return self.product_name    
     
-#class VariationManager(models.Manager):
-    #def colors(self):
-       # return super(VariationManager,self).filter(variation_category='color',is_active=True)    
-    
-    
-    #def sizes(self):
-       # return super(VariationManager,self).filter(variation_category='size',is_active=True)
-    
-#variation_category_choice=(('color','color'),('size','size'),)    
-  # add here  
+    def averageReview(self):
+        from acounts.models import ReviewRating        
+        reviews=ReviewRating.objects.filter(product=self,status=True).aggregate(average=Avg('rating'))
+        avg=0
+        if reviews['average'] is not None:
+            avg=float(reviews['average'])
+        return avg    
+    def count(self):
+        from acounts.models import ReviewRating        
+        reviews=ReviewRating.objects.filter(product=self,status=True).aggregate(count=Count('id'))
+        count=0
+        if reviews['count'] is not None:
+            count=int(reviews['count'])
+        return count
+
 class Variation(models.Model):
     product=models.ForeignKey(Product, on_delete=models.CASCADE)
     #variation_category=models.CharField(max_length=100,choices=variation_category_choice)    
@@ -104,15 +110,12 @@ class Variation(models.Model):
     offer_price     =models.FloatField(blank=True,null=True)
     stock           =models.IntegerField(default=0) 
     is_active=models.BooleanField(default=True)
-    created_date=models.DateField(auto_now_add=True)
-    
-    #objects=VariationManager()
-    
+    created_date=models.DateField(auto_now_add=True)    
     #def __str__(self):
        # return self.variation_value
+       
+
+       
     
     
-    
-    
-    
-# Create your models here.
+ 

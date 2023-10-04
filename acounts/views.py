@@ -51,11 +51,18 @@ def register(request):
             user.save()            
             # check for referal codes
             try:
-                reference_code=form.cleaned_data['reference_code']
-                user.referal_code=reference_code
-                user.save()
-                
+                print('1')
+                referal_code=form.cleaned_data['reference_code']                
+                print('2',referal_code)
+                if referal_code:
+                    print('3')
+                    referred_by=Acount.objects.get(Referal_code=referal_code)
+                    print('4')
+                    code=Referal_code.objects.create(code=referal_code,referrer_user=referred_by,referred_user=user,
+                                                     gift_money=5)
+               
             except :
+                print('except')
                 pass        
                     
            # acount activation
@@ -71,12 +78,12 @@ def register(request):
                                       
             to_email=email
             send_email=EmailMessage(mail_subject,message,to=[to_email])
-            
+            send_email.send()           
             
             # check otp verification
             otp=generate_random_otp()
             account_sid = "ACd61c3ec36ca81a50af865490b6342a4a"
-            auth_token = "2a75a7a5927abe689856fc537db4ffd5"
+            auth_token = "c30826b729cf83ddd7564e3769add539"
             client = Client(account_sid, auth_token)
             message = client.messages \
                 .create(
@@ -91,7 +98,7 @@ def register(request):
                      to=phone_number
                  )
             print(message.sid)    
-            send_email.send()
+            
             
             # messages.success(request,'Thank you for regestering with us,we have sent an verification link to your Email adress.Please verify it..')
             return redirect ('/acounts/login/?command=verification&email='+email)
@@ -230,16 +237,14 @@ def activate(request,uidb64,token):
         UserProfile.objects.create(user=user) 
         # try for any referal codes
         try:
-                reference_code=user.referal_code
-                code=Referal_code.objects.get(code=reference_code)                
-                if code:                   
-                    code.referred_user=user   
-                    code.is_activated=True
-                    code.save()           
-                    money=code.gift_money
+                reference_code=Referal_code.objects.get(referred_user=user)                               
+                if reference_code:                    
+                    reference_code.is_activated=True
+                    reference_code.save()           
+                    money=reference_code.gift_money
                     user.wallet_money +=money
                     user.save()
-                    referrer=code.referrer_user
+                    referrer=reference_code.referrer_user
                     referrer.wallet_money+=money
                     referrer.save()                    
         except Referal_code.DoesNotExist:                
@@ -508,18 +513,14 @@ def refer(request,email_id=None):
     user=request.user
     if request.method=='POST':
         email=request.POST['email']
-        print(email)        
-        code=Referal_code.objects.create(
-            referrer_user=request.user,
-            gift_money=10
-        )
-        referal_code=code.code
+        referal_code=user.Referal_code       
+        
         # sen mail to referred person        
         current_site=get_current_site(request)
         mail_subject='Please click the below link to register your acount'
         message=render_to_string('acounts/refer_link.html',{                                    
                                     'domain':current_site,    
-                                    'code':code                                                                   
+                                    'code':referal_code                                                                   
                                 })                               
                                     
         to_email=email
@@ -528,10 +529,15 @@ def refer(request,email_id=None):
         messages.success(request,f"Referal code sent to {email}",extra_tags='refer')
         return redirect('refer')
     else:
+        referal_code=user.Referal_code
         codes=Referal_code.objects.filter(referrer_user=user)
+        context={
+            'referal_code':referal_code,
+            'codes':codes
+        }
                 
     
-    return render(request,'acounts/refer.html',{'codes':codes})
+    return render(request,'acounts/refer.html',context)
             
 
     

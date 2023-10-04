@@ -32,107 +32,146 @@
     <div class="row">
         <aside class="col-md-3">
             
-    <div class="card">
-        <article class="filter-group">
-            <header class="card-header">
-                <a href="#" data-toggle="collapse" data-target="#collapse_1" aria-expanded="true" class="">
-                    <i class="icon-control fa fa-chevron-down"></i>
-                    <h6 class="title">Categories</h6>
-                </a>
-            </header>
-            <div class="filter-content collapse show" id="collapse_1" >
-                <div class="card-body">
-                    
-                    <ul class="list-menu">
-                        <li><a href="{% url 'store' %}">All Products</a></li>
-                        {% for category in links %}
-                    <li><a href="{{ category.get_url }}">{{ category.category_name }} </a></li>
-                    {% endfor %}
-                  
-                    
-                    <li><a href="#">People </a></li>
-                    </ul>
-    
-                </div> <!-- card-body.// -->
-            </div>
-        </article> <!-- filter-group  .// -->
-        <article class="filter-group">
-            <header class="card-header">
-                <a href="#" data-toggle="collapse" data-target="#collapse_4" aria-expanded="true" class="">
-                    <i class="icon-control fa fa-chevron-down"></i>
-                    <h6 class="title">Sizes </h6>
-                </a>
-            </header>
-            <div class="filter-content collapse show" id="collapse_4" >
-                <div class="card-body">
-                  <label class="checkbox-btn">
-                    <input type="checkbox">
-                    <span class="btn btn-light"> XS </span>
-                  </label>
-    
-                  <label class="checkbox-btn">
-                    <input type="checkbox">
-                    <span class="btn btn-light"> SM </span>
-                  </label>
-    
-                  <label class="checkbox-btn">
-                    <input type="checkbox">
-                    <span class="btn btn-light"> LG </span>
-                  </label>
-    
-                  <label class="checkbox-btn">
-                    <input type="checkbox">
-                    <span class="btn btn-light"> XXL </span>
-                  </label>
-            </div><!-- card-body.// -->
-            </div>
-        </article> <!-- filter-group .// -->
-        
-        <article class="filter-group">
-            <header class="card-header">
-                <a href="#" data-toggle="collapse" data-target="#collapse_3" aria-expanded="true" class="">
-                    <i class="icon-control fa fa-chevron-down"></i>
-                    <h6 class="title">Price range </h6>
-                </a>
-            </header>
-            <div class="filter-content collapse show" id="collapse_3" >
-                <div class="card-body">
-                    
-                    <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label>Min</label>
-                      <!-- <input class="form-control" placeholder="$0" type="number"> -->
-                          <select class="mr-2 form-control">
-                            <option value="0">$0</option>
-                            <option value="50">$50</option>
-                            <option value="100">$100</option>
-                            <option value="150">$150</option>
-                            <option value="200">$200</option>
-                            <option value="500">$500</option>
-                            <option value="1000">$1000</option>
-                        </select>
+            <div class="card">
+                <article class="filter-group">
+                    <header class="card-header" style="margin-left: 20px;">
+                        <a href="#" data-toggle="collapse" data-target="#collapse_1" aria-expanded="true" class="">
+                            <i class="icon-control fa fa-chevron-down"></i>
+                            <h6 class="title">Categories</h6>
+                        </a>
+                    </header>
+                    <div class="filter-content collapse show" id="collapse_1">
+                        <div class="card-body">
+                            <form method="GET" action="{% url 'filter_products' %}">
+                                <div style="margin-left: 15px;">
+                              
+                                {% for category in links %}
+                                    <label class="checkbox-btn">
+                                        <input type="checkbox" name="category" value="{{ category.id }}"                                        
+                                        {% if category.id|stringformat:"d" in filters.category %}
+                                        checked{% endif %}>
+                                        <span class="btn btn-light">{{ category.category_name }}</span>
+                                    </label>
+                              
+                                {% endfor %}
+                                
+                            </div>
+                                <!-- Rest of your category checkboxes -->
+            
+                                <!-- Sizes -->
+                                <header class="card-header">
+                                    <a href="#" data-toggle="collapse" data-target="#collapse_4" aria-expanded="true" class="">
+                                        <i class="icon-control fa fa-chevron-down"></i>
+                                        <h6 class="title">Sizes</h6>
+                                    </a>
+                                </header>
+                                <div class="filter-content collapse show" id="collapse_4">
+                                    <div class="card-body">
+                                        {% for size in chart %}
+                                        <label class="checkbox-btn">
+                                            <input type="checkbox" name="size" value="{{ size.id }}"{% if size.id|stringformat:"d" in filters.size %}
+                                            checked{% endif %}>
+                                            <span class="btn btn-light">{{ size }}</span>
+                                        </label>
+                                        
+                                        {% endfor %}
+            
+                                       
+                                    </div><!-- card-body.// -->
+                                </div>
+            
+                                <!-- Price Range -->
+                                <header class="card-header">
+                                    <a href="#" data-toggle="collapse" data-target="#collapse_3" aria-expanded="true" class="">
+                                        <i class="icon-control fa fa-chevron-down"></i>
+                                        <h6 class="title">Price range</h6>
+                                    </a>
+                                </header>
+                                <div class="filter-content collapse show" id="collapse_3">
+                                    <div class="card-body">
+                                        <div class="form-row">
+                                            <div class="form-group col-md-12">
+                                                <label for="min_price">Min Price</label>
+                                               
+                                                <input type="range" class="form-control-range" id="min_price" name="min_price" 
+                                                min="0" max="200" {% if filters.min_price > 0 %}
+                                                value="{{ filters.min_price }}"
+                                            {% else %}
+                                                value="0"
+                                            {% endif %}
+                                            >          
+                                                <span class="range-value" id="min_price_value">$0</span>
+                                            </div>
+                                            <div class="form-group col-md-12">
+                                                <label for="max_price">Max Price</label>
+                                                <input type="range" class="form-control-range" id="max_price" name="max_price" min="0" max="200"
+                                                {% if filters.max_price > 0 %}
+                                                value="{{ filters.max_price }}"
+                                            {% else %}
+                                                value="0"
+                                            {% endif %}>
+                                                <span class="range-value" id="max_price_value">$100</span>
+                                            </div>
+                                            
+                                            
+                                        </div> <!-- form-row.// -->
+                                        <button type="submit" class="btn btn-block btn-primary">Apply Filters</button>                                        
+                                        <a href="{% url 'store' %}" class="btn btn-block btn-outline-primary">Clear selection</a>
+                                    </div><!-- card-body.// -->
+                                </div>
+            
+                               
+                            </form>
+                        </div><!-- card-body.// -->
                     </div>
-                    <div class="form-group text-right col-md-6">
-                      <label>Max</label>
-                          <select class="mr-2 form-control">
-                            <option value="50">$50</option>
-                            <option value="100">$100</option>
-                            <option value="150">$150</option>
-                            <option value="200">$200</option>
-                            <option value="500">$500</option>
-                            <option value="1000">$1000</option>
-                            <option value="2000">$2000+</option>
-                        </select>
-                    </div>
-                    </div> <!-- form-row.// -->
-                    <button class="btn btn-block btn-primary">Apply</button>
-                </div><!-- card-body.// -->
-            </div>
-        </article> <!-- filter-group .// -->
-        
-    </div> <!-- card.// -->
-    
+                </article> <!-- filter-group .// -->
+                <!-- Rest of your filtering options (e.g., colors) -->
+            </div> <!-- card.// -->
+            <script>
+                // Get references to the range sliders and range values
+                const minPriceSlider = document.getElementById("min_price");
+                const maxPriceSlider = document.getElementById("max_price");
+                const minPriceValue = document.getElementById("min_price_value");
+                const maxPriceValue = document.getElementById("max_price_value");
+            
+                // Initialize the range values based on filters or defaults
+                const minPrice = "{{ filters.min_price|default:0 }}";
+                const maxPrice = "{{ filters.max_price|default:200 }}";
+            
+                minPriceValue.textContent = "$" + minPrice;
+                maxPriceValue.textContent = "$" + maxPrice;
+            
+                // Update the range values based on slider positions
+                minPriceSlider.addEventListener("input", function () {
+                    const newMinPrice = this.value;
+                    const newMaxPrice = parseInt(maxPriceSlider.value);
+            
+                    minPriceValue.textContent = "$" + newMinPrice;
+                    maxPriceSlider.min = newMinPrice;
+            
+                    if (newMaxPrice < newMinPrice) {
+                        maxPriceSlider.value = newMinPrice;
+                        maxPriceValue.textContent = "$" + newMinPrice;
+                    }
+                });
+            
+                maxPriceSlider.addEventListener("input", function () {
+                    const newMaxPrice = this.value;
+                    const newMinPrice = parseInt(minPriceSlider.value);
+            
+                    maxPriceValue.textContent = "$" + newMaxPrice;
+                    minPriceSlider.max = newMaxPrice;
+            
+                    if (newMinPrice > newMaxPrice) {
+                        minPriceSlider.value = newMaxPrice;
+                        minPriceValue.textContent = "$" + newMaxPrice;
+                    }
+                });
+            </script>
+            
+            
         </aside> <!-- col.// -->
+        
         <main class="col-md-9">
     
     <header class="border-bottom mb-4 pb-3">
