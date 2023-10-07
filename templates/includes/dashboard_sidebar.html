@@ -3,11 +3,11 @@
     <ul class="list-group">
         <a class="list-group-item {% if '/user_dashboard' in request.path %} active {% endif %}" href="{% url 'user_dashboard' %}"> Dashboard </a>
         <a class="list-group-item {% if '/my_orders' in request.path or '/or_pr_detail' in request.path %}active{% endif %}" href="{% url 'my_orders' %}">My orders</a>
-
-        <a class="list-group-item {% if '/edit_profile' in request.path %} active {% endif %}" href="{% url 'edit_profile' %}"> Edit profile </a>
+         <a class="list-group-item {% if '/edit_profile' in request.path %} active {% endif %}" href="{% url 'edit_profile' %}"> Edit profile </a>
         <a class="list-group-item {% if '/change_password' in request.path %} active {% endif %}" href="{% url 'change_password' %}">Change Password </a>
         <a class="list-group-item {% if '/manage_adress' in request.path or '/edit_adress' in request.path %} active {% endif %}" href="{% url 'manage_adress' %}">Manage Adresses </a>
         <a class="list-group-item {% if '/refer' in request.path %} active {% endif %}" href="{% url 'refer' %}">Refer </a>
+        <a class="list-group-item {% if '/wallet' in request.path %} active {% endif %}" href="{% url 'wallet' %}">Wallet </a>
 
        <!-- #region <a class="list-group-item {% if '/coupons' in request.path  %} active {% endif %}" href="{% url 'coupons' %}">Coupons </a>
          #region -->

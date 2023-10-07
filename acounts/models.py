@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
 from twilio.rest import Client
 from store.models import Product,Variation
 import random,string
+from decimal import Decimal
 
 class MyacountManager(BaseUserManager):
     def create_user(self,first_name,last_name,username,email,password=None):
@@ -56,8 +57,7 @@ class Acount(AbstractBaseUser):
     last_name = models.CharField( max_length=50)
     username = models.CharField(max_length=50,unique=True)
     email = models.EmailField( max_length=254,unique=True)
-    phone_number = models.CharField(max_length=50)
-    wallet_money=models.IntegerField(default=0)
+    phone_number = models.CharField(max_length=50)    
     Referal_code=models.CharField( max_length=6,unique=True,default=generate_unique_referral_code) 
 
 # required fields as its custome user model
@@ -166,14 +166,27 @@ class Wallet(models.Model):
     def __str__(self):
         return f"{self.user.username}'s wallet"
     
+    def add_fund(self,amount):
+        if amount > 0:
+            self.balance += Decimal(amount)
+            self.save()
+            
+    def deduct_fund(self,amount):
+        if amount>0:
+            self.balance -= Decimal(amount)
+            self.save()        
+    
 class Transaction(models.Model):
-    Wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)     
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)     
     amount = models.DecimalField( max_digits=10, decimal_places=2)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    balance=models.DecimalField( max_digits=5, decimal_places=2)
+    date = models.DateTimeField(auto_now_add=True)
     description = models.CharField(max_length=250,blank=True)  
     
     def __str__(self):
         return f"Transaction for {self.wallet.user.username} - {self.amount}"
+    
+
 
      
    

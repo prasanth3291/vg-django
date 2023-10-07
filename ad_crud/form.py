@@ -1,5 +1,5 @@
 from django.core.exceptions import ValidationError
-from store.models import Product
+from store.models import Product,Offer,com_offers
 from django import forms
 from acounts.models import Coupons
 
@@ -37,3 +37,32 @@ class CouponsForm(forms.ModelForm):
         super(CouponsForm,self).__init__(*args,**kwargs)
         for field in self.fields:
             self.fields[field].widget.attrs['class']='form-control'    
+
+
+class CategoryOfferForm(forms.ModelForm):
+    start_date = forms.DateField(widget = forms.DateInput(attrs={'type':'date'}))
+    end_date = forms.DateField(widget = forms.DateInput(attrs={'type':'date'}))
+    class Meta:
+        model=Offer
+        fields=['name','discount','start_date','end_date','description']
+    
+    def __init__(self,*args,**kwargs):
+        super(CategoryOfferForm,self).__init__(*args,**kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control' 
+            
+class Minimum_purchaseOfferForm(forms.ModelForm):
+    start_date = forms.DateField(widget = forms.DateInput(attrs={'type':'date'}))
+    end_date = forms.DateField(widget = forms.DateInput(attrs={'type':'date'}))
+    class Meta:
+        model = com_offers
+        fields = ['name','description','discount','start_date','end_date','mimimum_value','maximum_discount'] 
+        
+    def __init__(self, *args, **kwargs):
+        super(Minimum_purchaseOfferForm,self).__init__(*args,**kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control' 
+        
+             
+            
+        

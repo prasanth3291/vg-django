@@ -110,13 +110,31 @@
     
             <div class="card">
             <div class="card-body">
+              {% if order.order_details.discount_from_offers or order.order_details.discount_from_coupons %}
+              <dl class="dlist-align">
+                <dt>Sub total:</dt>
+                <dd class="text-right">$ {{order.order_details.original_total}}</dd>
+              </dl>
+              {% endif %}
+              {% if order.order_details.discount_from_offers %}
+              <dl class="dlist-align">
+                <dt>Discount from offers:</dt>
+                <dd class="text-right">-$ {{order.order_details.discount_from_offers|floatformat:2}}</dd>
+              </dl>
+              {% endif %}
+              {% if order.order_details.discount_from_coupons %}
+              <dl class="dlist-align">
+                <dt>Discount from coupons:</dt>
+                <dd class="text-right">-$ {{order.order_details.discount_from_coupons}}</dd>
+              </dl>
+              {% endif %}
                 <dl class="dlist-align">
                   <dt>Total price:</dt>
                   <dd class="text-right">$ {{total}}</dd>
                 </dl>
                 <dl class="dlist-align">
                   <dt>Tax:</dt>
-                  <dd class="text-right">{{tax}}</dd>
+                  <dd class="text-right">$ {{tax}}</dd>
                 </dl>
                 <dl class="dlist-align">
                   <dt>Total:</dt>

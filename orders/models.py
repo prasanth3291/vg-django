@@ -1,6 +1,6 @@
 from django.db import models
 from acounts.models import Acount,Coupons
-from store.models import Product,Variation
+from store.models import Product,Variation,Offer,com_offers
 from carts.models import CartItem
 
 
@@ -44,6 +44,10 @@ class Order(models.Model):
     is_ordered=models.BooleanField(default=False)
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
+    # offers and coupons
+    offers=models.ForeignKey(com_offers, on_delete=models.CASCADE,blank=True,null=True)
+    discount=models.DecimalField( max_digits=10, decimal_places=2,default=0)
+    
     
     
     def full_name(self):
@@ -69,6 +73,20 @@ class OrderProduct(models.Model):
     
     def __str__(self):
         return self.product.product_name
+    
+class order_details(models.Model):
+    order = models.OneToOneField(Order, on_delete=models.CASCADE)   
+    original_total=models.FloatField()
+    discount_from_coupons = models.FloatField(blank=True)
+    discount_from_offers = models.FloatField(blank=True)
+    sub_total = models.FloatField()
+    tax = models.FloatField()
+    grand_total = models.FloatField()
+    status=models.BooleanField(default=False)
+    
+    
+    
+    
     
     
 

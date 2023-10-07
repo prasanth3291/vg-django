@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from .forms import RegistrationForms,UserForm,UserProfileForm,AdressForm
-from.models import Acount,UserProfile,Adress,Coupons,Wishlist,Referal_code
+from.models import Acount,UserProfile,Adress,Coupons,Wishlist,Referal_code,Wallet,Transaction
 from django.contrib import messages,auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate,login as auth_login
@@ -51,16 +51,11 @@ def register(request):
             user.save()            
             # check for referal codes
             try:
-                print('1')
-                referal_code=form.cleaned_data['reference_code']                
-                print('2',referal_code)
+                referal_code=form.cleaned_data['reference_code']                      
                 if referal_code:
-                    print('3')
                     referred_by=Acount.objects.get(Referal_code=referal_code)
-                    print('4')
                     code=Referal_code.objects.create(code=referal_code,referrer_user=referred_by,referred_user=user,
-                                                     gift_money=5)
-               
+                                                     gift_money=5)   
             except :
                 print('except')
                 pass        
@@ -83,7 +78,7 @@ def register(request):
             # check otp verification
             otp=generate_random_otp()
             account_sid = "ACd61c3ec36ca81a50af865490b6342a4a"
-            auth_token = "c30826b729cf83ddd7564e3769add539"
+            auth_token = "f0fa28e0bdcb634f215ded0de20a4efb"
             client = Client(account_sid, auth_token)
             message = client.messages \
                 .create(
@@ -235,17 +230,25 @@ def activate(request,uidb64,token):
         user.save()
         messages.success(request,'Congratulations Your Acount is activated')   
         UserProfile.objects.create(user=user) 
+        Wallet.objects.create(user=user)
         # try for any referal codes
         try:
                 reference_code=Referal_code.objects.get(referred_user=user)                               
                 if reference_code:                    
                     reference_code.is_activated=True
-                    reference_code.save()           
-                    money=reference_code.gift_money
-                    user.wallet_money +=money
-                    user.save()
-                    referrer=reference_code.referrer_user
-                    referrer.wallet_money+=money
+                    reference_code.save()      
+                    # here walet function
+                    wallet=Wallet.objects.get(user=user)                         
+                    amount = reference_code.gift_money
+                    wallet.add_fund(amount)
+                    referrer = reference_code.referrer_user
+                    referrer_wallet = Wallet.objects.get(user=referrer)
+                    referrer_wallet.add_fund(amount)
+                    user_transaction=Transaction(wallet=wallet,amount=amount,description='Referal coupon',balance=wallet.balance )
+                    user_transaction.save()
+                    refere_transaction=Transaction(wallet=referrer_wallet,amount=amount,description='Referal coupon',balance=referrer_wallet.balance )
+                    refere_transaction.save()                    
+                    referrer=reference_code.referrer_user                    
                     referrer.save()                    
         except Referal_code.DoesNotExist:                
                 pass     
@@ -538,6 +541,21 @@ def refer(request,email_id=None):
                 
     
     return render(request,'acounts/refer.html',context)
+
+# wallet function
+def wallet(request):
+    if request.user.is_authenticated:
+        try:
+            wallet=Wallet.objects.get(user = request.user)
+            transactions=Transaction.objects.filter(wallet=wallet).order_by('date')
+        except Wallet.DoesNotExist:
+            pass
+        context={
+            'wallet':wallet,
+            'transactions':transactions
+        }    
+    return render(request,'acounts/wallet.html',context)
+
             
 
     

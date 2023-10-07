@@ -55,7 +55,7 @@
                 </aside>
                 <main class="col-md-6 border-left">
                     <article class="content-body">
-                        <form action="{% url 'add_cart' single_product.id %}" method="POST">
+                        <form action="{% url 'add_cart' single_product.id %}" method="POST" id="product-form"> 
                             {% csrf_token %}
                             <h2 class="title mb-0">{{ single_product.product_name }}</h2>
                             <div class="mb-2 ">
@@ -122,8 +122,15 @@
                         <div style="display: flex;">
                                     <div style="padding-right: 5px;">
                                         <button type="submit" class="btn btn-primary">
-                                            <span class="text">Add to cart</span>
+                                            <span class="text">Buy now</span>
+                                        </button>
+                                    </div>
+                                    <div style="padding-right: 5px;">
+                                        <button type="button" class="btn btn-info" id="buy-now-button">
+                                            <input type="hidden" name="next-1" value="1">
+                                              <span class="text">Add to cart</span>
                                             <i class="fas fa-shopping-cart"></i>
+                                            
                                         </button>
                                     </div>
                             {% endif %}
@@ -348,6 +355,14 @@
         // Call updateSizeOptions to update the size options based on the default selected color
         updateSizeOptions();
     });
+        </script>
+        <script>
+            document.getElementById('buy-now-button').addEventListener('click', function () {
+                // Set the 'next' input value to the current URL (request.path) when the button is clicked.
+                document.querySelector('input[name="next-1"]').value = window.location.pathname;
+                // Submit the form.
+                document.getElementById('product-form').submit();
+            });
         </script>
         
 {% endblock %}

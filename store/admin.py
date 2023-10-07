@@ -1,5 +1,5 @@
 from django.contrib import admin
-from.models import Product,softdelete,NonDeleted,Variation,Color,Size,Offer,Discount
+from.models import Product,softdelete,NonDeleted,Variation,Color,Size,Offer,Discount,com_offers
 
 # Define a custom admin action to apply an offer to Men's Shirts
 def apply_offer_men_shirts(modeladmin, request, queryset):
@@ -67,6 +67,7 @@ admin.site.register(Color)
 admin.site.register(Size)
 admin.site.register(Discount)
 admin.site.register(Offer)
+admin.site.register(com_offers)
 
 
     

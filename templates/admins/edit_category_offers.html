@@ -1,0 +1,59 @@
+{% extends 'admins/base.html' %}
+
+{% block content %}
+
+<div class="container" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
+    {% include 'includes/alerts.html' %}
+    <div class="row">
+       
+    <main class="col-md-9">
+        <article class="card">
+        <header class="card-header">
+            <strong class="d-inline-block mr-3">Edit Offer</strong>
+            
+        </header>
+        <div class="card-body">            
+            <div class="row">                 
+                <div class="col md-12">
+                    <form action="{% url 'edit_category_offer' offer.id %}" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label >Offer name</label>
+                                {{offer_form.name}}
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label >Discount</label>
+                                {{offer_form.discount}}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label >Valid rom</label>
+                                {{offer_form.start_date}}
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label >Valid to</label>
+                                {{offer_form.end_date}}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label >Description</label>
+                                {{offer_form.description}}
+                            </div>
+                            
+                        </div>
+                        
+                        <input type="submit" value="Save" class="btn btn-primary">                           
+                    </form>
+                   
+                </div>
+            </div>
+
+        </div> <!-- card-body .// -->
+        </div>
+        </div>
+       
+        
+        {% endblock %}

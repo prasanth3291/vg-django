@@ -100,7 +100,8 @@ def product_detail(request,category_slug,Product_slug):
     
     order_products=None
     try:
-        order_products=OrderProduct.objects.filter(user=request.user,product=single_product) 
+        if request.user.is_authenticated:
+            order_products=OrderProduct.objects.filter(user=request.user,product=single_product) 
     except OrderProduct.DoesNotExist:
         pass           
                  

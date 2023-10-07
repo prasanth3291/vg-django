@@ -26,6 +26,7 @@ urlpatterns = [
     path('wish_list/', views.wish_list, name='wish_list'),
     path('refer/<str:email_id>/', views.refer, name='refer'),
     path('refer/', views.refer, name='refer'),
+    path('wallet/', views.wallet, name='wallet'),
    
     
     

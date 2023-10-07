@@ -35,28 +35,50 @@
 
 </head>
 <body>
-    <h1>Invoice</h1>
+    <h1 style="text-align: center;">INVOICE</h1>
     <div class="header" style="justify-content: space-between;display: flex;width:50;background-color: aquamarine;">
 
         <div class="header-left">
-            <p>Invoice Number: {{ invoice_number }}</p>
-            <p>Date: {{ invoice_date }}</p>
-            <p>Customer: {{ customer_name }}</p>
+
         </div>
         <div class="header-right" style="position: absolute;left:550px">
-            <p>Invoice Number: {{ invoice_number }}</p>
-            <p>Date: {{ invoice_date }}</p>
-            <p>Customer: {{ customer_name }}</p>
+
             <!-- Add any content you want on the right side of the header here -->
         </div>
     </div>
-    <table>
+    <table >
         <thead>
-            <tr>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Unit Price</th>
-                <th>Total</th>
+            <tr >
+                <td style="font-weight: 600;font-size: large;text-align: left;border:none;width:370px;">Invoice Number: {{ invoice_number }} <br>
+                    Date: {{ invoice_date }} <br>
+                    Customer: {{ customer_name }} <br>
+                <br>
+                <br>
+                
+            </td>
+                <td style="font-weight: 600;font-size: large;border:none;text-align: right;width:370px;"> {{ order.first_name }} {{order.last_name}} <br>
+                    {{  order.adress_line1  }} <br>
+                    {{ order.adress_line2 }} <br>
+                    {{ order.city }},{{ order.state }} <br>
+                    {{ order.pin }}
+                </td>
+               
+            </tr>
+        </thead>
+        <tbody>  
+           
+               
+             </tbody>
+        
+    </table>
+
+    <table style="text-align: center;">
+        <thead>
+            <tr >
+                <th style="font-weight: 600;font-size: large;width: 200px;text-align: center;">Product</th>
+                <th style="font-weight: 600;font-size: large;width: 200px;text-align: center;">Quantity</th>
+                <th style="font-weight: 600;font-size: large;width: 200px;text-align: center;">Unit Price</th>
+                <th style="font-weight: 600;font-size: large;width: 200px;text-align: center;">Total</th>
             </tr>
         </thead>
         <tbody>
@@ -77,7 +99,36 @@
         
     </table>
 
-    <p>Total Amount: {{ total_amount }}</p>
+    <table >
+        <thead>
+            <tr >
+                <td style="font-weight: 600;font-size: large;padding-right: 0;text-align: right;border:none;width:700px;">Sub Total :<br>
+                    Discount : <br>
+                    total :  <br>
+                    Tax :<br>
+                    Grand total :
+                
+                
+                
+            </td>
+                <td style="font-weight: 600;font-size: large;border:none;text-align: left;width:100px;">
+                   
+                    
+                    $ {{ total  }}  <br>                    
+                    $ {{ discount|floatformat:2 }} <br>
+                    $ {{ ord_det.sub_total|floatformat:2 }} <br>
+                    $ {{ ord_det.tax|floatformat:2 }} <br>
+                    $ {{ ord_det.grand_total|floatformat:2 }} 
+                </td>
+               
+            </tr>
+        </thead>
+        <tbody>  
+           
+               
+             </tbody>
+        
+    </table>
 
   
 </body>

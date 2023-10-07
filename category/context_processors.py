@@ -6,6 +6,7 @@ def menu_links(request):
     links1=Sub_category.objects.all()
     chart=Size.objects.all()
     
+    
     return dict(links=links,links1=links1,chart=chart)
 
 

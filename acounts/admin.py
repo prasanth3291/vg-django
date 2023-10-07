@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from.models import Acount,UserProfile,Adress,Coupons,Wishlist,Referal_code,ReviewRating
+from.models import Acount,UserProfile,Adress,Coupons,Wishlist,Referal_code,ReviewRating,Wallet,Transaction
 from django.utils.html import format_html 
 from django.utils import timezone
 
@@ -43,5 +43,7 @@ admin.site.register(Adress)
 admin.site.register(Coupons,CouponsAdmin)
 admin.site.register(Wishlist)
 admin.site.register(ReviewRating)
+admin.site.register(Wallet)
+admin.site.register(Transaction)
 
 # Register your models here.

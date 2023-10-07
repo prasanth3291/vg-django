@@ -2,25 +2,27 @@ from django.shortcuts import render,redirect
 from django.shortcuts import HttpResponse,get_object_or_404
 from django.http import JsonResponse
 from carts.models import CartItem,UserCoupons
-from store.models import Product
+from store.models import Product,com_offers
 from .form import OrderForm
 import datetime
-from.models import Order,Payment,OrderProduct
+from.models import Order,Payment,OrderProduct,order_details
 import uuid
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 #new 
 from django.views import View
-from acounts.models import Adress
+from acounts.models import Adress,Wallet,Transaction
 import json
 from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from io import BytesIO
 from django.contrib import messages
+from django.db.models import Q
 
 # Create your views here.
 def payments(request,order_number):
+    print(123)
     # Create a payment record
     body=json.loads(request.body)
     order=Order.objects.get(user=request.user,is_ordered=False,order_number=body['orderID'])
@@ -38,6 +40,7 @@ def payments(request,order_number):
     order.status='Accepted'
     order.save()
     print("payment")
+
      #  ove the cart items to the order product table
     cart_items=CartItem.objects.filter(user=request.user)
     for i in cart_items:
@@ -54,20 +57,15 @@ def payments(request,order_number):
         orpr.product_price =price 
         orpr.total=price*item.quantity
         orpr.ordered=True        
-        orpr.save()
-        print(orpr.product_price)
-        #cart_item=CartItem.objects.get(id=item.id)
-        #product_variation=cart_item.variations
+        orpr.save()        
         orderproduct=OrderProduct.objects.get(id=orpr.id)
         orderproduct.variations=item.variations
         orderproduct.save()
+        
         # reduce quantity of the product
-        product=Product.objects.get(id=item.product_id)
-        #product.stock -=item.quantity
+        product=Product.objects.get(id=item.product_id)    
         variation=item.variations
-        print("stch",variation.stock)
         variation.stock -=item.quantity
-        #product.save()
         variation.save()    
     CartItem.objects.filter(user=request.user).delete()    
     
@@ -93,39 +91,50 @@ def payments(request,order_number):
    
 
 def place_order(request,total=0,quantity=0):
+    # delete all unsuccessful orders
+    unsuccessful_orders=Order.objects.all().exclude( Q(status='Cancelled') | Q(status='Completed'))
+    unsuccessful_orders.delete()
+    
+    
     current_user=request.user
     # if the cart count is less than or equal to zero 
     cart_items=CartItem.objects.filter(user=current_user)
     cart_count=cart_items.count()
     if cart_count <=0:
         return redirect('store')    
-    total=0
-    grand_total=0
-    tax=0
-    price=0
-    user_coupon=None
-    coupon_discount=0
+    original_total = 0 
+    total = 0
+    grand_total = 0    
+    tax = 0
+    price = 0
+    user_coupon = None
+    coupon_discount = 0
+    discount_from_coupons = 0
+    discount_from_offers = 0
     # here we will check any coupons applied still active
     try:        
         user_coupon=UserCoupons.objects.get(user=request.user,applied=True,is_active=True)        
     except:
         pass
-    # if coupon aplly discount    
+    # if coupon aplly discount   
+   
     if user_coupon:   
         coupon_discount=user_coupon.coupon.discount         
     for cart_item in cart_items:
         if cart_item.variations.offer_price:
-            price=cart_item.variations.offer_price
+            price=cart_item.variations.offer_price            
         else:
             price=cart_item.variations.price    
         total += (price * cart_item.quantity)
+        original_total += cart_item.variations.price * cart_item.quantity
         quantity += cart_item.quantity
-    total=total-(total*coupon_discount)/100    
+    discount_from_coupons = (total*coupon_discount)/100   
+    offer = original_total - total    
+    print('offer=',offer)
+    print('total=',total)
+    total=total- discount_from_coupons
     tax=(18*total)/100
-    grand_total=total+tax    
-    total = round(total, 2)
-    tax = round(tax, 2)  
-    grand_total = round(grand_total, 2)
+    grand_total=total+tax       
     
      # Retrieve the user's saved addresses
     saved_addresses = Adress.objects.filter(user=current_user)
@@ -134,6 +143,15 @@ def place_order(request,total=0,quantity=0):
         #fetch the adress selected 
         
         selected_address_id = request.POST.get('selected_address')
+        try:
+            sel_offer=request.POST.get('selected_offer')
+        except :
+            pass
+        try:
+            c_offer=com_offers.objects.get(id=sel_offer)            
+        except com_offers.DoesNotExist:
+            pass        
+       
         
         if selected_address_id !='new' :
             try:
@@ -144,6 +162,8 @@ def place_order(request,total=0,quantity=0):
                 return redirect('checkout')             
                   
             # Create an order record with the selected address
+            
+            
             order1 = Order.objects.create(
                 user=current_user,
                 first_name=selected_address.name,
@@ -158,8 +178,9 @@ def place_order(request,total=0,quantity=0):
                   # Include order note
                 order_total=grand_total,
                 tax=tax,
-                ip=request.META.get('REMOTE_ADDR'),                
-            )       
+                ip=request.META.get('REMOTE_ADDR'),   
+                # here com offers                 
+            )                   
                 # generate order number
             yr=int(datetime.date.today().strftime('%Y'))
             dt=int(datetime.date.today().strftime('%d'))
@@ -167,8 +188,31 @@ def place_order(request,total=0,quantity=0):
             d=datetime.date(yr,mt,dt)
             current_date=d.strftime('%Y%m%d')
             order_number=current_date+str(order1.id)
-            order1.order_number=order_number            
-            order1.save()
+            order1.order_number=order_number      
+            order1.save()   
+            order_det=order_details.objects.create(order=order1,original_total=original_total,discount_from_coupons=discount_from_coupons
+                                                   ,discount_from_offers=discount_from_offers,
+                                                   sub_total=total,tax=tax,grand_total=grand_total)                  
+            try:
+                if  c_offer:
+                    # check if offer exceeds maxium discount
+                    mx_discount=c_offer.maximum_discount
+                    order1.offers = c_offer
+                    discount_from_offer = original_total * (c_offer.discount /100) 
+                    if discount_from_offer > mx_discount:
+                        discount_from_offer=mx_discount
+                    discount_from_offers = discount_from_offer + offer                   
+                    total = total - discount_from_offer                  
+                    tax = total * (18/100) 
+                    grand_total = total + tax
+                    order_det.discount_from_coupons = discount_from_coupons
+                    order_det.discount_from_offers = discount_from_offers
+                    order_det.sub_total = total
+                    order_det.tax = tax 
+                    order_det.grand_total = grand_total
+                    order_det.save()
+            except:
+                pass    
             order=Order.objects.get(user=current_user,is_ordered=False,order_number=order_number)    
             
         else:  
@@ -202,8 +246,7 @@ def place_order(request,total=0,quantity=0):
                 adress.save()
         
             # upto here            
-            if form.is_valid():
-                print('form is valid')
+            if form.is_valid():                
                 # store all the billing information inside order table 
                 data=Order()
                 data.user=current_user
@@ -229,21 +272,48 @@ def place_order(request,total=0,quantity=0):
                 d=datetime.date(yr,mt,dt)
                 current_date=d.strftime('%Y%m%d')
                 order_number=current_date+str(data.id)
-                data.order_number=order_number
-                data.save()
+                data.order_number=order_number               
+                data.save()                
+                order_det=order_details.objects.create(order=data,original_total=original_total,
+                                                       discount_from_coupons=discount_from_coupons
+                                                   ,discount_from_offers=discount_from_offers,
+                                                   sub_total=total,tax=tax,grand_total=grand_total)
+                try:
+                    if  c_offer:
+                        data.offers=c_offer
+                        mx_discount=c_offer.maximum_discount
+                        discount_from_offer = total * (c_offer.discount /100) 
+                        discount_from_offers = discount_from_offer + offer
+                        if discount_from_offer > mx_discount:
+                            discount_from_offer=mx_discount
+                        total = total - discount_from_offer   
+                        tax = total * (18/100) 
+                        grand_total = total + tax
+                        order_det.discount_from_coupons = discount_from_coupons
+                        order_det.discount_from_offers = discount_from_offers
+                        order_det.sub_total = total
+                        order_det.tax = tax 
+                        order_det.grand_total = grand_total
+                        order_det.save()
+                except:
+                    pass  
                 order=Order.objects.get(user=current_user,is_ordered=False,order_number=order_number)
+                
             else:                
                 form=OrderForm()    
                 print(form.errors)    
                
-        print('you are here')        
+        print('you are here') 
+        total = round(total, 2)
+        tax = round(tax, 2)  
+        grand_total = round(grand_total, 2)       
         context={
                     'saved_addresses': saved_addresses,
                     'order':order,
                     'cart_items':cart_items,
                     'total':total,
                     'tax':tax,
-                    'grand_total':grand_total
+                    'grand_total':float(grand_total)
                 }
         print(order.order_number)
         return render(request,'orders/payments.html',context)
@@ -280,6 +350,18 @@ def cancel_order(request,order_number):
                 i.save()      
             if request.user.is_admin:
                 return redirect('orders') 
+            
+        #here wallet
+        try:
+            wallet=Wallet.objects.get(user=request.user)
+            if order.status == 'Cancelled':
+               amount=order.order_total
+               wallet.add_fund(amount)
+               description=f"Refund for order #{order.order_number}"
+               transaction=Transaction(wallet=wallet,amount=amount,description=description,balance=wallet.balance)
+               transaction.save()
+        except Wallet.DoesNotExist:
+            pass           
            
             return redirect('user_dashboard')
     if request.user.is_admin:
@@ -303,18 +385,37 @@ def order_complete(request):
         order=Order.objects.get(order_number=order_number,is_ordered=True)
         order.status='Completed'
         order.save()
-        order_products=OrderProduct.objects.filter(order_id=order.id)     
+        order_products=OrderProduct.objects.filter(order_id=order.id)   
+        total=0        
+        # order deatils
+        ord_det=order_details.objects.get(order=order)
+        ord_det.status=True
+        ord_det.save()
+        for op in order_products:
+            price = op.variations.offer_price if op.variations.offer_price else op.variations.price
+            total += price * op.quantity  
         payment=Payment.objects.get(payment_id=transID)     
         subtotal=order.order_total-order.tax   
+        subtotal=round(subtotal,2)
+        # to find offer from offers only 
+        cat_offer = ord_det.original_total - total
+        discount = ord_det.discount_from_coupons+ord_det.discount_from_offers-cat_offer
+        discount=round(discount,2)
+        
+        
+        
         context={
             'order':order,
             'order_products':order_products,
             'transID':payment.payment_id,
             'payment':payment,
-            'subtotal':subtotal
+            'subtotal':subtotal,
+            'total':total,
+            'discount':discount,
+            'ord_det':ord_det
         }
         return render(request,'orders/order_confirmation.html',context)
-    except (Payment.DoesNotExist , Order.DoedNotexist):
+    except (Payment.DoesNotExist , Order.DoesNotexist):
         return redirect('home')
 
 
@@ -334,18 +435,29 @@ class ViewPDF(View):
 	def get(self,request,order_id):
         
          order=Order.objects.get(id=order_id)
+         ord_det=order_details.objects.get(order=order)
          payment=order.payment
          order_products=OrderProduct.objects.filter(order=order)    
          grand_total=order.order_total
+         # find irdr det
+         total = 0
+         for op in order_products:
+            price = op.variations.offer_price if op.variations.offer_price else op.variations.price
+            total += price * op.quantity     
+         cat_offer = ord_det.original_total - total
+         discount = ord_det.discount_from_coupons + ord_det.discount_from_offers - cat_offer    
          data = {
         'invoice_number': order.order_number,
         'invoice_date': payment.created_at,
         'customer_name': order.full_name,      
-        'total_amount': payment.amount_paid,
+        'total': total,
         'items':order_products,        
         'order_total':order.order_total,
         'tax':order.tax,
-        'grand_total':grand_total
+        'grand_total':grand_total,
+        'ord_det':ord_det,
+        'order':order,
+        'discount':discount
                     }
          pdf = render_to_pdf('orders/invoice.html', data)
          return HttpResponse(pdf, content_type='application/pdf')
@@ -388,19 +500,30 @@ class DownloadPDF(View):
 def generate_invoice_pdf(request,order_id):
     # Get invoice data (replace with your data retrieval logic)
     order=Order.objects.get(id=order_id)
+    ord_det=order_details.objects.get(order=order)
     payment=order.payment
     order_products=OrderProduct.objects.filter(order=order)    
     grand_total=order.order_total
+    # find irdr det
+    total = 0
+    for op in order_products:
+        price = op.variations.offer_price if op.variations.offer_price else op.variations.price
+    total += price * op.quantity     
+    cat_offer = ord_det.original_total - total
+    discount = ord_det.discount_from_coupons + ord_det.discount_from_offers - cat_offer    
     invoice_data = {
         'invoice_number': order.order_number,
         'invoice_date': payment.created_at,
         'customer_name': order.full_name,      
-        'total_amount': payment.amount_paid,
+        'total': total,
         'items':order_products,        
         'order_total':order.order_total,
         'tax':order.tax,
-        'grand_total':grand_total
-    }
+        'grand_total':grand_total,
+        'ord_det':ord_det,
+        'order':order,
+        'discount':discount
+                    }
   
 
     # Render the HTML template with data

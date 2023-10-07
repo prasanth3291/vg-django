@@ -1,11 +1,13 @@
 from django.shortcuts import render,redirect,get_object_or_404,HttpResponse
-from store.models import Product,Variation,Color,Size
+from store.models import Product,Variation,Color,Size,com_offers,Offer
 from carts.models import Carts,CartItem,UserCoupons
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 from acounts.models import Adress,Coupons
 from django.contrib import messages,auth
 from datetime import datetime
+from decimal import Decimal
+from django.http import JsonResponse
 def cart_id(request):
     cart=request.session.session_key
     if not cart:
@@ -13,21 +15,25 @@ def cart_id(request):
     return cart    
 
 def add_cart(request,product_id):
+    # try for path
+    next_url = '1'
+    try:
+        next_url = request.POST.get('next-1')
+    except:
+        pass    
+    print('url=',next_url)
     
     current_user=request.user
     product=Product.objects.get(id=product_id) # here use variations instead prodcut
     # now fetch all variations of that product
     variation=None
-
+    next
     # if the user is authenticated:
     if current_user.is_authenticated:
         #product_variation=[]
         if request.method =='POST':
-            print("authe user inside try block")
             color_id=request.POST['color']    
-            print("1",color_id)    
             size_id=request.POST['size']    
-            print("2",size_id)
             
             try:
                 print('here also')
@@ -43,8 +49,7 @@ def add_cart(request,product_id):
                 pass  
         #print(product_variation)
         is_cart_item_exists=CartItem.objects.filter(product=product,user=current_user).exists()
-        if is_cart_item_exists:            
-            print('cart item exusts')
+        if is_cart_item_exists:
             cart_item=CartItem.objects.filter(product=product,user=current_user)
             # exis. variation --> from database            
             # current variations--> from product variation
@@ -58,13 +63,16 @@ def add_cart(request,product_id):
                 id.append(item.id)
           
             
-            if variation in existing_variation_list:
+            if variation in existing_variation_list and next_url != '1':
                 # increase the product quantity
                 index=existing_variation_list.index(variation)
                 item_id=id[index]
                 item=CartItem.objects.get(product=product,id=item_id)
                 item.quantity += 1
                 item.save()
+            elif  variation in existing_variation_list and next_url is not None :  
+                print("yesno")
+                pass      
                 
             else:
                 # create a cart item
@@ -81,14 +89,16 @@ def add_cart(request,product_id):
             )  
             cart_item.save()
         print("yes")
-        print(variation.price)        
-        return  redirect('carts')
+        print(variation.price)   
+        if next_url and next_url !='1':
+            return redirect(next_url)     
+        else:
+            return  redirect('carts')
     
 
     # if the user is not authenticated    
     else:    
         if request.method =='POST':
-            print("got inside")
             color_id=request.POST['color']        
             size_id=request.POST['size']   
             
@@ -126,14 +136,15 @@ def add_cart(request,product_id):
                 id.append(item.id)
           
             
-            if variation in existing_variation_list:
+            if variation in existing_variation_list and  next_url != '1':
                 # increase the product quantity
                 index=existing_variation_list.index(variation)
                 item_id=id[index]
                 item=CartItem.objects.get(product=product,id=item_id)
                 item.quantity += 1
                 item.save()
-                
+            elif  variation in existing_variation_list and next_url is not None :  
+                pass  
             else:
                 # create a cart item
                 item=CartItem.objects.create(product=product,quantity=1,cart=cart,variations=variation)               
@@ -146,10 +157,11 @@ def add_cart(request,product_id):
                 cart=cart,
                 variations=variation  
             )  
-            cart_item.save()
-        print("yes")
-        print(variation)        
-        return  redirect('carts')
+            cart_item.save()      
+        if next_url and next_url !='1':
+            return redirect(next_url)     
+        else:
+            return  redirect('carts')
 
 
         
@@ -230,6 +242,7 @@ def remove_cart_item(request,product_id,cart_item_id):
 
 @login_required(login_url='login') 
 def checkout(request,total=0,quantity=0,cart_items=None): 
+    from store.models import com_offers
     total=0
     discount=0
     discount_value=0
@@ -242,11 +255,16 @@ def checkout(request,total=0,quantity=0,cart_items=None):
     current_user=request.user
     saved_addresses = Adress.objects.filter(user=current_user)
     coupons=Coupons.objects.all()
+    c_offers=None
+    try:
+        c_offers=com_offers.objects.all()
+        
+    except:
+        pass
     #if the request method is post.ie when someone aplly coupon
     if request.method=='POST':        
         user=request.user        
-        # form here,check that the coupon entered is 1) active 2)date expired #3)count>0     
-             
+        # form here,check that the coupon entered is 1) active 2)date expired #3)count>0                  
         valid_coupon=None
         try:
             coupon_name=request.POST.get('coupon_code')#fetch the coupen id from form  
@@ -272,9 +290,9 @@ def checkout(request,total=0,quantity=0,cart_items=None):
                 return redirect('checkout')
             #if everything satisfies
             else:  
-                coupon_discount          =valid_coupon.discount
-                coupon_mv                =valid_coupon.minimum_amount
-                coupon_max_discount_value=valid_coupon.maximum_discount            
+                coupon_discount = valid_coupon.discount
+                coupon_mv = valid_coupon.minimum_amount
+                coupon_max_discount_value = valid_coupon.maximum_discount            
         #coupons=Coupons.objects.filter(user=request.user)#fetch all coupons of the user            
         user_coupons=UserCoupons.objects.filter(user=request.user)#get user all applied coupon if any
         if not UserCoupons.objects.filter(user=request.user,coupon=valid_coupon).exists():                       
@@ -330,7 +348,8 @@ def checkout(request,total=0,quantity=0,cart_items=None):
                 'user_coupon':user_coupon ,
                 'used':used,
                 'original_total':original_total,
-                'offer_discount':offer_discount        
+                'offer_discount':offer_discount,
+                'com_offers':c_offers        
                     }                  
                 return render(request,'store/checkout.html',context)                             
         try:
@@ -399,7 +418,8 @@ def checkout(request,total=0,quantity=0,cart_items=None):
         'coupon_discount':coupon_discount,
         'discount_value':discount_value,
         'original_total':original_total,
-        'offer_discount':offer_discount
+        'offer_discount':offer_discount,
+        'com_offers':c_offers
                 
                 }       
     else:
@@ -441,9 +461,51 @@ def checkout(request,total=0,quantity=0,cart_items=None):
             'saved_addresses':saved_addresses,
             'coupons':coupons,
             'original_total':original_total,
-            'offer_discount':offer_discount        
+            'offer_discount':offer_discount,
+            'com_offers':c_offers        
                     }                  
     return render(request,'store/checkout.html',context)
         
 
 # Create your views here.
+def apply_offer(request):
+    if request.method == 'GET':
+        offer_id=offer_id = Decimal(request.GET.get('offer_id'))
+        offer = com_offers.objects.get(id=offer_id)      
+        mn_vl=offer.mimimum_value
+        mx_vl=offer.maximum_discount        
+        original_total = Decimal(request.GET.get('original_total')) 
+        offer_discount = Decimal(request.GET.get('discountOffer'))     
+        coupon_discount = Decimal(request.GET.get('discountCoupon'))  
+        if original_total >= mn_vl:            
+            discount = (offer.discount)
+            offer_applied_discount = (original_total * discount/100)  
+            if offer_applied_discount > mx_vl: 
+                offer_applied_discount = mx_vl
+                messages.success(request,f"Maximum discount is {mx_vl}",extra_tags="com_offer")                                  
+            total_offer_discount = Decimal(offer_discount+offer_applied_discount)  
+            total_discount = coupon_discount+total_offer_discount  
+            new_total = float(original_total - total_discount )    
+            total_offer_discount=float(total_offer_discount)  
+            tax = new_total * (18/100)
+            new_grand_total = new_total + tax
+            response_data={
+                'total_offer_discount':total_offer_discount,
+                'total_discount':total_discount,
+                'new_total':new_total,
+                'tax':tax,
+                'new_grand_total':new_grand_total
+            }   
+            print(total_offer_discount)
+            # Return the new total price in the response
+            return JsonResponse(response_data)
+        else:
+            
+            error_message = f"Purchase for ${mn_vl} or above to avail this offer"
+            response_data={
+                'error_message':str(error_message),
+                
+            }
+            return JsonResponse(response_data)
+        
+

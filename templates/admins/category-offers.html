@@ -1,0 +1,64 @@
+{% extends 'admins/base.html' %}
+
+{% block content %}
+
+<section class="section-conten padding-y bg" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
+    <div class="container mt-3">
+        {% include 'includes/alerts.html' %}
+        <div class="row">    
+        <main class="col-md-12 m-3"> 
+            <div class="d-flex justify-content-end" style="margin-right: 100px;"> <!-- Use a flex container for alignment -->
+                <a href="{% url 'add_category_offer' %}" class="btn btn-primary me-3">Add Offer</a>
+            </div>
+            <div class="card-header">
+                <h6>CATEGORY OFFERS</h6>
+              
+          
+            <table class="table bg-white">
+                <thead>
+                  <tr class="tr bg-info">
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>                   
+                    <th scope="col">Valid from</th>
+                    <th scope="col">Valid to</th>
+                    <th scope="col">Discount </th>                     
+                    <th scope='col'>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for offer in cat_offers %}
+                  <tr>
+                    <td>{{forloop.counter}}</td>
+                     <td><a href="{% url 'edit_category_offer' offer.id %}" style="font-weight: 1000;font-size: medium;">{{offer.name}}</a></td>                    
+                    <td>{{offer.start_date}}</td>
+                    <td>{{offer.end_date}}</td>
+                    <td>{{offer.discount}}</td>                    
+                    <td><a href="{% url 'delete_category_offer' offer.id %}" class="btn btn-danger m-0 p-1" 
+                        onclick="return confirm('Ares you sure you want delete this item')">Delete</a></td>
+                
+                  </tr>
+                  {% endfor %}
+                  
+                </tbody>
+              </table>
+
+            </div>
+                  
+            
+            <div class="card-body">              
+                
+              
+
+                </div> <!-- row.// -->
+            </div> <!-- card-body .// -->
+         
+            </article> <!-- order-group.// --> 
+        </main>
+    </div> <!-- row.// -->
+    </div>
+    
+    
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+
+{% endblock %}

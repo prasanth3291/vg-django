@@ -22,7 +22,18 @@ urlpatterns = [
     path('edit_coupons/<int:coupon_id>/',views.edit_coupons,name='edit_coupons'),    
     path('delete_coupons/<int:coupon_id>/',views.delete_coupons,name='delete_coupons'),    
     path('profiles/<int:customer_id>/',views.profiles,name='profiles'),
-    path('ad_refer',views.ad_refer,name='ad_refer')
+    path('ad_refer',views.ad_refer,name='ad_refer'),
+    path('minimum_purchase_offers',views.minimum_purchase_offers,name='minimum_purchase_offers'),
+    path('category_offers',views.category_offers,name='category_offers'),
+    path('edit_category_offer/<int:offer_id>/',views.edit_category_offer,name='edit_category_offer'),
+    path('add_category_offer',views.add_category_offer,name='add_category_offer'),
+    path('delete_category_offer/<int:offer_id>/',views.delete_category_offer,name='delete_category_offer'),
+    path('edit_minimum_purchaseoffer/<int:offer_id>/',views.edit_minimum_purchase_offer,name='edit_minimum_purchase_offer'),
+    path('add_minimum_purchase_offer',views.add_minimum_purchase_offer,name='add_minimum_purchase_offer'),
+    path('delete_minimum_purchase_offer/<int:offer_id>/',views.delete_minimum_purchase_offer,name='delete_minimum_purchase_offer')
+     
+
+     
 
 
     

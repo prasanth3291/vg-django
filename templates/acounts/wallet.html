@@ -15,17 +15,17 @@
         <main class="col-md-9">
             <article class="card">
             <header class="card-header">
-                <strong class="d-inline-block mr-3">Logged in as</strong>
-                <span>{{user.first_name}}</span>
+                <strong class="d-inline-block mr-3">My wallet</strong>
+                
             </header>
             <div class="card-body">
                 <div class="row"> 
                     <div class="col md-6">
                         <div class="card" style="text-align: center;">
                             <div class="card-body">
-                                <h5 class="card-title">Total orders</h5>
-                                <h4>{{orders_count}}</h4>
-                                <a href="{% url 'my_orders' %}">View orders</a>
+                                <h5 class="card-title">Balance</h5>
+                                <h4>$ {{user.wallet.balance}}</h4>
+                               
                             </div>
                         </div>
                     </div>
@@ -46,6 +46,32 @@
             </div> <!-- card-body .// -->
          
             </article> <!-- order-group.// --> 
+            <div class="card mt-3">
+                <table class="table text-center">
+                    <thead style="background-color: rgb(143, 241, 241);">
+                      <tr>                    
+                        <th scope="col">Transaction</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Balance</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions %}                       
+                      <tr>                    
+                        <td class="text-dark" style="font-weight: bolder;">{{forloop.counter}}</td>
+                        <td>{{transaction.amount}}</td>
+                        <td>{{transaction.balance}}</td>
+                        <td>{{transaction.description}}</td>
+                        <td>{{transaction.date}}</td>
+                      </tr>
+                      
+                      {% endfor %}
+                    
+                    </tbody>
+                  </table>
+                </div>
         </main>
     </div> <!-- row.// -->
     </div>

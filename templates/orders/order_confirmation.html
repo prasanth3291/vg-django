@@ -59,7 +59,9 @@
                                         <thead>
                                             <tr>
                                                 <th class="per70 text-center">Description</th>
-                                                <th class="per5 text-center">Qty</th>
+                                                <th class="per10 text-center">Price</th>
+                                                <th class="per10 text-center">Offer price</th>
+                                                <th class="per10 text-center">Qty</th>
                                                 <th class="per25 text-center">Total</th>
                                             </tr>
                                         </thead>
@@ -68,6 +70,8 @@
                                             <tr>
                                                
                                                 <td>Name:{{op.product}} <br>Color:{{op.variations.color}} <br>Size:{{op.variations.size}}</td>
+                                                <td class="text-center">{{op.variations.price}}</td>
+                                                <td class="text-center">{{op.product_price}}</td>
                                                 <td class="text-center">{{op.quantity}}</td>
                                                 <td class="text-center">{{op.total}}</td>
                                                 
@@ -77,17 +81,25 @@
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <th colspan="2" class="text-right">Sub Total:</th>
-                                                <th class="text-center">${{subtotal}} USD</th>
+                                                <th colspan="4" class="text-right">Total:</th>
+                                                <th class="text-center">${{total}} USD</th>
                                             </tr>
                                             <tr>
-                                                <th colspan="2" class="text-right">Tax:</th>
-                                                <th class="text-center">${{order.tax}} USD</th>
+                                                <th colspan="4" class="text-right">Discount:</th>
+                                                <th class="text-center">${{discount}} USD</th>
+                                            </tr>
+                                            <tr>
+                                                <th colspan="4" class="text-right">Sub Total:</th>
+                                                <th class="text-center">${{ord_det.sub_total}} USD</th>
+                                            </tr>
+                                            <tr>
+                                                <th colspan="4" class="text-right">Tax:</th>
+                                                <th class="text-center">${{ord_det.tax|floatformat:2}} USD</th>
                                             </tr>
                                             
                                             <tr>
-                                                <th colspan="2" class="text-right">Grand Total:</th>
-                                                <th class="text-center">${{order.order_total}} USD</th>
+                                                <th colspan="4" class="text-right">Grand Total:</th>
+                                                <th class="text-center">${{ord_det.grand_total}} USD</th>
                                             </tr>
                                         </tfoot>
                                     </table>

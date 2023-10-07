@@ -1,0 +1,61 @@
+{% extends 'admins/base.html' %}
+
+{% block content %}
+
+<section class="section-conten padding-y bg" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
+    <div class="container mt-3">
+        {% include 'includes/alerts.html' %}
+        <div class="row">    
+        <main class="col-md-6 m-3">               
+                <div class="row">        
+                    <h5 class="sd ms-3 mb-3">Add Category Offer</h5>        
+                    
+                    <div class="col md-6">
+                        <form action="{% url 'add_category_offer' %}" method="POST" >
+                            {% csrf_token %}
+                          
+                            <div class="form-group ">                                
+                                <input type="text" name="name" class="form-control" placeholder="Name" required>
+                            </div>
+                            <div class="form-group ">
+                                <select name="discount"  class="form-control" required style="font-weight: 100;">
+                                    {% for discount in discounts %}
+                                    <option value="{{ discount.id }}" {% if discount.id == offer.discount.id %}selected{% endif %} >
+                                        {{ discount }}
+                                    </option>
+                                {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                
+                                <input type="date" name="valid_from" class="form-control" placeholder="Valid from" required>
+                            </div>
+                            <div class="form-group">
+                                
+                                <input type="date" name="valid_to" class="form-control" placeholder="Valid To" required>
+                            </div>
+                           
+                            <div class="form-group">
+                                
+                                <input type="text" name="description" class="form-control" placeholder="Description" required>
+                            </div>
+                            <input type="submit" value="Save" class="btn btn-primary">
+                           
+                        </form>
+                       
+                        </div>
+                    </div>
+
+                </div> <!-- row.// -->
+            </div> <!-- card-body .// -->
+         
+            </article> <!-- order-group.// --> 
+        </main>
+    </div> <!-- row.// -->
+    </div>
+    
+    
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+
+{% endblock %}

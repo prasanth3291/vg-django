@@ -104,14 +104,97 @@
                                 </div>
                                 <!-- ... (other form fields for a new address) ... -->
                             </div>
+                           
 
                             <!-- Button for Place Order -->
-                            <button type="submit" class="btn btn-primary btn-block mt-4">Place Order</button>
-                        </form>
+                        
                     </div> <!-- card-body.// -->
+                    {% if com_offers %}
+                    <div class="card mt-2 mb-2">
+                        <div class="card-body">
+                            <div id="error" style="font-weight: 600;font-size: medium;color: rgb(233, 70, 64);"></div> 
+                            <h5 class="card-title">Offers</h5>
+                            {% for offer in com_offers %}
+                            <div class="form-check " style="align-items: self;">
+                                <input style="margin-top: 8px;" class="form-check-input" type="radio" name="selected_offer" id="offer{{ offer.id }}" value="{{ offer.id }}">
+                                <label class="form-check-label" for="offer{{ offer.id }}">
+                                    <span class="text-danger" style="font-weight: 800;font-size: larger;">{{offer.name}}:</span>                                    
+                                    <span style="font-weight: 700;font-size: medium;">{{offer.description}}</span>                                                                                                            
+                                </label>                              
+                            </div>
+                            <br>  {% endfor %}
+                        </div>
+                        {% endif %}
+                    <button type="submit" class="btn btn-primary btn-block mt-4">Place Order</button>
+                </form>
             
                 
             </aside> <!-- col.// -->
+            <script>
+            // Assuming you're using jQuery for simplicity, you can use vanilla JavaScript if preferred
+            $(document).ready(function() {
+            $('input[name="selected_offer"]').on('change', function() {
+            // Get the selected offer's ID
+            var offerId = $(this).val();
+            // Get the text content of the element
+            var originalTotalText = $('#original-total-value').text();
+            // Remove the dollar symbol and any leading/trailing spaces, then parse it as a float
+            var originalTotal = parseFloat(originalTotalText.replace('$', '').trim());           
+            var discountCoupon = parseFloat($('#discount-coupon').text());
+            var discountOffer = parseFloat($('#offer-discount').text());
+            var total = parseFloat($('#total').text());
+            var grandTotal = parseFloat($('#grand-total').text());
+            if (isNaN(discountCoupon)) {
+                discountCoupon = 0;
+            }
+            if (isNaN(discountOffer)) {
+                discountOffer = 0;
+            }
+                    
+            // Send an AJAX request to the Django view
+             $.ajax({
+                    url: '/carts/apply_offer/', // Replace with the actual URL of your Django view
+                    type: 'GET', // You can use GET or POST depending on your needs
+                    data: {
+                        'offer_id': offerId,
+                        'original_total': originalTotal,
+                        'discountCoupon':discountCoupon,
+                        'discountOffer':discountOffer,
+                        'total':total,
+                        'grandTotal':grandTotal
+
+                    },
+                    success: function(data) 
+                    {
+                    // Handle the response from the Django view
+                    console.log(data);
+                    if ('error_message' in data) {
+                        $('#error').text(data.error_message);
+                        setTimeout(function() {
+                            location.reload();
+                        }, 2000);
+                        
+                    } else {
+                        console.log('no error');
+
+                    $('#grand-total').text('$' + data.new_grand_total.toFixed(2));         
+                    $('#total').text('$' + data.new_total.toFixed(2));                   
+                    $('#offer-discount-new').text('$' + data.total_offer_discount.toFixed(2));
+                    $('#tax').text('$' + data.tax.toFixed(2));
+                    $('#offer-discount-new').css('display', 'block');
+                    $('#offer-discount-new-1').css('display', 'block');
+                    $('#offer-discount').css('display', 'none');
+                    $('#offer-discount-1').css('display', 'none');
+                    $('#original-total-value').css('display', 'block');
+                    $('#original-total-value-1').css('display', 'block');
+                    }
+                }
+
+                    });
+                });
+            });
+
+            </script>
             <aside class="col-lg-6">
                 <div class="card">
                     <div class="card-body">                        
@@ -230,33 +313,45 @@
                             {% if original_total != total %}
                             <dl class="dlist-align text-primary" >
                               <dt>Sub total:</dt>
-                              <dd class="text-right ">$ {{original_total}}</dd>
+                              <dd class="text-right "id="original-total-value"> ${{original_total}}</dd>
                             </dl>
                             {% endif %}
+                            {% if original_total == total %}
+                            <dl class="dlist-align text-primary" >
+                                <dt id="original-total-value-1" style="display: none;">Sub total:</dt>
+                                <dd class="text-right "id="original-total-value" style="display: none;"> ${{original_total}}</dd>
+                              </dl>
+                            {% endif %}
+                        
                             {% if discount_value %}
                             <dl class="dlist-align text-danger">
                                 <dt>Discount from Coupon:</dt>
-                                <dd class="text-right">- $ {{discount_value}}</dd>
+                                <dd class="text-right" id="discount-coupon"> {{discount_value}}</dd>
                               </dl>
+                              
                               {% endif %}
                               {% if offer_discount %}
                               <dl class="dlist-align text-success">
-                                <dt>Discount from offer:</dt>
-                                <dd class="text-right">- $ {{offer_discount}}</dd>
+                                <dt id="offer-discount-1" style="display: block;">Discount from offer:</dt>
+                                <dd class="text-right" id="offer-discount" style="display: block;"> {{offer_discount}}</dd>
                               </dl>
-                              {% endif %}
+                              {% endif %}                              
+                              <dl class="dlist-align text-success">
+                                <dt id="offer-discount-new-1" style="display: none;">Discount from offer:</dt>
+                                <dd class="text-right" id="offer-discount-new" style="display: none;"> {{offer_discount}}</dd>
+                              </dl>
                               <hr>
                               <dl class="dlist-align">
-                              <dt>Total price:</dt>
-                              <dd class="text-right">$ {{total}}</dd>
+                                <dt>Total price:</dt>
+                                <dd class="text-right" id="total">$ {{total}}</dd>
                             </dl>
                             <dl class="dlist-align">
-                              <dt>Tax:</dt>
-                              <dd class="text-right">${{tax}}</dd>
+                                <dt>Tax:</dt>
+                                <dd class="text-right" id="tax">$ {{tax}}</dd>
                             </dl>
                             <dl class="dlist-align text-primary">
                               <dt>Total:</dt>
-                              <dd class="text-right text-primary b"><strong>$ {{grand_total}}</strong></dd>
+                              <dd class="text-right text-primary b" id="grand-total"><strong>$ {{grand_total}}</strong></dd>
                             </dl>
                             <hr>
                             

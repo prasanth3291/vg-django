@@ -1,9 +1,9 @@
 from django.shortcuts import render,redirect
 from django.shortcuts import HttpResponse,get_object_or_404
 from acounts.models import Acount,Coupons,UserProfile,Referal_code
-from store.models import Product,softdelete,NonDeleted
+from store.models import Product,softdelete,NonDeleted,Offer,com_offers,Discount
 from category.models import category
-from.form import ProductForm,CouponsForm
+from.form import ProductForm,CouponsForm,CategoryOfferForm,Minimum_purchaseOfferForm
 from django.db.models import Q
 from django.contrib import messages
 from orders.models import Order,OrderProduct
@@ -255,8 +255,6 @@ def edit_coupons(request,coupon_id):
     if request.method=='POST':
         coupon_form =CouponsForm(request.POST, instance=coupon)
         if coupon_form.is_valid():
-            print('entered')
-            print(coupon.status)
             coupon_form.save()
             # Redirect or do something else after successful form submission
             return redirect('coupons')
@@ -306,8 +304,118 @@ def ad_refer(request):
     return render(request,'admins/admin-refer.html',{'codes':codes})
     
     
-        
+def category_offers(request):    
+    cat_offers=Offer.objects.all()
+    context = {
+        'cat_offers':cat_offers
+    }
+    return render(request,'admins/category-offers.html',context)
 
+def minimum_purchase_offers(request):    
+    com_offer=com_offers.objects.all()
+    context = {
+        'com_offers':com_offer
+    }
+    return render(request,'admins/minimum-purchase-offers.html',context)
+
+def add_category_offer(request):
+    discounts = Discount.objects.all()
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        discount = request.POST.get('discount')
+        start_date = request.POST.get('valid_from')
+        end_date = request.POST.get('valid_to') 
+        description= request.POST.get('description')
+        # create new offer
+        Offer.objects.create(
+            name=name,
+            description=description,
+            start_date=start_date,
+            end_date=end_date,
+            discount_id=discount
+        )
+        
+        return redirect('category_offers')
+    
+    context={
+            'discounts':discounts
+        }
+    
+    return render(request,'admins/add_category_offer.html',context)
+
+
+
+def edit_category_offer(request,offer_id):
+    offers = Offer.objects.get(id=offer_id)
+    if request.method == 'POST':
+        offer_form = CategoryOfferForm(request.POST,instance = offers)
+        offer_form.save()
+        context={
+        'offer':offers,
+        'offer_form':offer_form
+        }
+        return redirect('category_offers')
+    else:       
+        offer_form = CategoryOfferForm(instance=offers)
+        context={
+        'offer':offers,
+        'offer_form':offer_form
+        }
+        return render(request,'admins/edit_category_offers.html',context)
+        
+def delete_category_offer(request,offer_id):
+    category_offer = Offer.objects.get(id=offer_id)
+    category_offer.delete() 
+    return redirect('category_offers')       
+
+def add_minimum_purchase_offer(request):   
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        discount = request.POST.get('discount')
+        start_date = request.POST.get('valid_from')
+        end_date = request.POST.get('valid_to') 
+        description= request.POST.get('description')
+        minimum_value= request.POST.get('minimum_value')
+        maximum_discount= request.POST.get('maximum_discount')
+        # create new offer
+        com_offers.objects.create(
+            name = name,
+            description = description,
+            start_date = start_date,
+            end_date = end_date,
+            discount = discount,
+            mimimum_value = minimum_value,
+            maximum_discount = maximum_discount
+            
+        )
+        
+        return redirect('minimum_purchase_offers')
+    return render(request,'admins/add_minimum_purchase_offer.html')
+
+
+
+def edit_minimum_purchase_offer(request,offer_id):
+    offers = com_offers.objects.get(id=offer_id)
+    if request.method == 'POST':
+        offer_form = Minimum_purchaseOfferForm(request.POST,instance = offers)
+        offer_form.save()
+        context={
+        'offer':offers,
+        'offer_form':offer_form
+        }
+        return redirect('minimum_purchase_offers')
+    else:       
+        offer_form = Minimum_purchaseOfferForm(instance=offers)
+        context={
+        'offer':offers,
+        'offer_form':offer_form
+        }
+        return render(request,'admins/edit_minimum_purchase_offer.html',context)
+        
+def delete_minimum_purchase_offer(request,offer_id):
+    category_offer = com_offers.objects.get(id=offer_id)
+    category_offer.delete() 
+    return redirect('minimum_purchase_offers')       
      
                 
                      
