@@ -21,8 +21,6 @@ def add_cart(request,product_id):
         next_url = request.POST.get('next-1')
     except:
         pass    
-    print('url=',next_url)
-    
     current_user=request.user
     product=Product.objects.get(id=product_id) # here use variations instead prodcut
     # now fetch all variations of that product
@@ -36,16 +34,11 @@ def add_cart(request,product_id):
             size_id=request.POST['size']    
             
             try:
-                print('here also')
                 color = get_object_or_404(Color, color_name=color_id)
                 size = get_object_or_404(Size, size=size_id)
                 variation=Variation.objects.get(product=product, color=color, size=size)# got the exact variation
                 #product_variation.append(variation)
-                print(variation)
-                print(variation.price)
-               
             except:
-                print("first try block not worked its except block")
                 pass  
         #print(product_variation)
         is_cart_item_exists=CartItem.objects.filter(product=product,user=current_user).exists()
@@ -69,6 +62,12 @@ def add_cart(request,product_id):
                 item_id=id[index]
                 item=CartItem.objects.get(product=product,id=item_id)
                 item.quantity += 1
+                if item.quantity > variation.stock:
+                    messages.error(request,f"Only {variation.stock} piece is available for this variation",extra_tags='quantity')
+                    if next_url and next_url !='1':
+                        return redirect(next_url)     
+                    else:
+                        return  redirect('carts')                    
                 item.save()
             elif  variation in existing_variation_list and next_url is not None :  
                 print("yesno")
@@ -78,9 +77,7 @@ def add_cart(request,product_id):
                 # create a cart item
                 item=CartItem.objects.create(product=product,quantity=1,user=current_user,variations=variation)               
                 item.save()
-                print(variation.price)
         else:
-            print('cart item not exists')
             cart_item=CartItem.objects.create(
                 product=product,                
                 quantity =1,
@@ -88,14 +85,11 @@ def add_cart(request,product_id):
                 variations=variation  
             )  
             cart_item.save()
-        print("yes")
-        print(variation.price)   
+           
         if next_url and next_url !='1':
             return redirect(next_url)     
         else:
             return  redirect('carts')
-    
-
     # if the user is not authenticated    
     else:    
         if request.method =='POST':
@@ -103,18 +97,12 @@ def add_cart(request,product_id):
             size_id=request.POST['size']   
             
             try:
-                print('here also')
                 color = get_object_or_404(Color, color_name=color_id)
                 size = get_object_or_404(Size, size=size_id)
                 variation=Variation.objects.get(product=product, color=color, size=size)# got the exact variation
                 #product_variation.append(variation)
-                print(variation)
-                print(variation.price)
-               
             except:
-                print("i came here")
-                pass  
-            
+                pass              
         try:
             cart=Carts.objects.get(cart_id=cart_id(request))
         except Carts.DoesNotExist:
@@ -134,8 +122,6 @@ def add_cart(request,product_id):
                 existing_variation=item.variations
                 existing_variation_list.append(existing_variation)
                 id.append(item.id)
-          
-            
             if variation in existing_variation_list and  next_url != '1':
                 # increase the product quantity
                 index=existing_variation_list.index(variation)
@@ -150,7 +136,6 @@ def add_cart(request,product_id):
                 item=CartItem.objects.create(product=product,quantity=1,cart=cart,variations=variation)               
                 item.save()
         else:
-            print('entered')
             cart_item=CartItem.objects.create(
                 product=product,                
                 quantity =1,
@@ -161,24 +146,17 @@ def add_cart(request,product_id):
         if next_url and next_url !='1':
             return redirect(next_url)     
         else:
-            return  redirect('carts')
-
-
-        
+            return  redirect('carts')      
          
 def carts(request,total=0,quantity=0,cart_items=None):   
     tax=0
-    grand_total=0
-    
+    grand_total=0    
     try:
         if request.user.is_authenticated:
-            cart_items=CartItem.objects.filter(user=request.user,is_active=True).order_by('product')
-            
-        else:   
-        
+            cart_items=CartItem.objects.filter(user=request.user,is_active=True).order_by('product')            
+        else:           
             cart=Carts.objects.get(cart_id=cart_id(request))
-            cart_items=CartItem.objects.filter(cart=cart,is_active=True).order_by('product')
-            
+            cart_items=CartItem.objects.filter(cart=cart,is_active=True).order_by('product')            
         for cart_item in cart_items:  
             price=0          
             try:
@@ -201,17 +179,11 @@ def carts(request,total=0,quantity=0,cart_items=None):
         'quantity':quantity,
         'cart_items':cart_items,
         'tax':tax,
-        'grand_total':grand_total
-        
-    }
-    
+        'grand_total':grand_total        
+    }    
     return render(request,'store/cart.html',context)
-
-def remove_cart(request,product_id,cart_item_id):
-    
-    product=get_object_or_404(Product,id=product_id)
-    
-    
+def remove_cart(request,product_id,cart_item_id):    
+    product=get_object_or_404(Product,id=product_id)    
     try:
         if request.user.is_authenticated:
             cart_item=CartItem.objects.get(product=product,user=request.user,id=cart_item_id)
@@ -224,12 +196,10 @@ def remove_cart(request,product_id,cart_item_id):
         else:
             cart_item.delete()
     except:
-        pass        
-            
+        pass           
     return redirect('carts')  
 
-def remove_cart_item(request,product_id,cart_item_id):
-    
+def remove_cart_item(request,product_id,cart_item_id):    
     product=get_object_or_404(Product,id=product_id)
     if request.user.is_authenticated:
         cart_item=CartItem.objects.get(product=product,user=request.user,id=cart_item_id)
@@ -273,13 +243,10 @@ def checkout(request,total=0,quantity=0,cart_items=None):
             messages.error(request,"Invalid coupon name",extra_tags='coupon')
             return redirect('checkout')
             
-        if valid_coupon:           
-            print('coupon')            
+        if valid_coupon:                  
             #check the coupon is expired                       
             today=datetime.now().date()
-            print(today)
             valid_date=valid_coupon.valid_to
-            print(valid_date)
             #check for the valid date            
             if today>valid_date:
                 messages.error(request,"Coupon is expired",extra_tags='coupon')
@@ -376,7 +343,7 @@ def checkout(request,total=0,quantity=0,cart_items=None):
                     # check the discount value exceeds maxium discount
                     if coupon_max_discount_value<=discount_value:
                         discount_value=coupon_max_discount_value
-                        messages.success(request,f"Maximum discount is {coupon_discount}",extra_tags='coupon')                        
+                        messages.success(request,f"Maximum discount is {coupon_mv}",extra_tags='coupon')                        
                     total=total-discount_value                    
                     tax=(total * 18 )/100
                     total = round(total, 2)

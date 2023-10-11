@@ -50,6 +50,10 @@
             </form>
             </div>
             {% endif %}
+            {% if order.status == 'Cancelled' %}
+            <h4>Order is Cancelled</h4>
+            <h6>Reason for cancellation: {{order.reason_for_cancellation}}</h6>
+            {% endif %}
 
 
 

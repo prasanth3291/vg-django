@@ -8,12 +8,12 @@
 <section class="section-conten padding-y bg" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
     
 
-    <div class="container">
-        {% include 'includes/alerts.html' %}
+    <div class="container">        
         <div class="row">
             {% include 'includes/dashboard_sidebar.html' %}
         <main class="col-md-9">
             <article class="card">
+                {% include 'includes/alerts.html' %}
             <header class="card-header">
                 <strong class="d-inline-block mr-3">Logged in as</strong>
                 <span>{{user.first_name}}</span>

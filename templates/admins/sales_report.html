@@ -1,0 +1,140 @@
+{% extends 'admins/base.html' %}
+
+{% block content %}
+<style>
+    table {
+        border-collapse: collapse; /* Collapse adjacent borders into a single border */
+        width: 100%; /* Optional: Set the table width */
+    }
+
+    th, td {
+        border: 1px solid #dddddd; /* Add a 1px solid border to each table cell */
+        text-align: left; /* Optional: Set text alignment */
+        padding: 8px; /* Optional: Add padding to cells for spacing */
+    }
+
+    /* Optional: Add styles for table header cells */
+    th {
+        background-color: #f2f2f2; /* Set background color for header cells */
+    }
+</style>
+
+<div class="container mt-3" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
+    <div class="table-wrapper">
+        <div class="table-title">
+            <div class="row">
+                {% if messages %}
+                 <div class="messages">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                    </div>
+                    {% endif %}
+                
+               
+               
+            </div>
+        </div>
+        <div class="d-flex justify-content-end" style="margin-right: 100px;"> <!-- Use a flex container for alignment -->
+            <a href="{% url 'generate_sales_report_pdf' %}" class="btn btn-primary me-3">Generate report</a>
+        </div>
+        <table class="table table-white " style="border-style: solid;text-align: center;">
+            <thead  style="background-color: rgb(173, 243, 243);">
+                <tr style="text-align: center;border-style: solid;">
+                    
+                    <th>Order number</th>
+                    <th>Order item</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th>Promotions <br> Applied</th>
+                    <th>Price</th>
+                    <th>Tax</th>
+                    <th>Total Price</th>
+                    <th>Payment method</th>                   
+                    
+                    
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                
+                <tr>
+                    
+                   
+                    <td style="font-weight: 600;font-size: medium;text-align: center;">{{order.order_number}}</td>
+                    <td>
+                    
+                    {% for op in order.orderproduct_set.all %}
+                    <table>
+                        <tr>
+                            <td>{{op.product.product_name}}</td>
+                            
+                           
+                        </tr>
+                    </table>
+                        {% endfor %}
+                    </td>    
+                    <td>
+                        {% for op in order.orderproduct_set.all %}
+                        <table>
+                            <tr>
+                                
+                                <td>{{op.quantity}}</td>
+                               
+                            </tr>
+                        </table>
+                            {% endfor %}
+
+                    </td>
+                
+                    <td>{{ order.order_details.original_total|floatformat:2 }}</td>          
+                    <td>{{ order.order_details.total_discount|floatformat:2 }}
+                    
+                    </td>     
+                    
+                    <td>{{ order.order_details.sub_total|floatformat:2 }}</td>
+                    <td>{{ order.order_details.tax|floatformat:2 }}</td>
+                    <td>{{ order.order_details.grand_total|floatformat:2 }}</td>
+                    <td>{{ order.payment.payment_method}}</td>
+                 
+
+                </tr>
+                
+                
+                {% endfor %}
+
+                  <!-- #region <td>
+                        
+                        <a href="#deleteEmployeeModal-{{forloop.counter}}" class="delete btn btn-danger" data-toggle="modal">Cancel</a>
+                    </td> --> 
+          
+               
+
+            </tbody>
+        </table>
+        <table class="table table-white " style="border-style: solid;text-align: center;">
+
+                <tr style="text-align: center;border-style: solid;"> 
+                    <th class="text-right" style="width: 80%;">Todays Orders</th>
+                    <th >Todays revenue</th>     
+                    <th class="text-right" style="width: 80%;">Total Orders</th>
+                    <th >Total revenue</th>  
+                </tr>
+                <tr>
+                    <th class="text-right">{{today_orders}}</th>
+                    <th>${{today_sales|floatformat:2}}</th>
+                    <th class="text-right">{{total_orders}}</th>
+                    <th>${{total_sales|floatformat:2}}</th>
+
+                </tr>
+    
+            <tbody>
+
+            </tbody>
+        </table>
+        
+    </div>
+</div>
+
+{% endblock %}

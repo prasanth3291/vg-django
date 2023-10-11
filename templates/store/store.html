@@ -5,6 +5,7 @@
 {% block content %}
 
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.0/css/font-awesome.css">
 
 
 <!-- ========================= SECTION PAGETOP ========================= -->
@@ -180,56 +181,171 @@
                 
             </div>
     </header><!-- sect-heading -->
-    
+    {% if not filters %}
     <div class="row">
-        {% for item in products %}
-        {% if item.variation_set.exists %}
-    <div class="col-md-4 d-flex justify-content-center align-items-center text-center">
-        <figure class="card card-product-grid">
-            <div class="img-wrap"> 
-                <a href="{{ item.get_url }}"><img src="{{ item.images.url }}"></a>
-            </div> <!-- img-wrap.// -->
-            <figcaption class="info-wrap">
-                <div class="fix-height">
+            
+            {% for item in products %}
+            {% if item.variation_set.exists %}
+            <div class="col-md-4 d-flex justify-content-center align-items-center text-center">
+            <figure class="card card-product-grid">
+                <div class="img-wrap" style="position: relative;">
+                    <a href="{{ item.get_url }}"><img src="{{ item.images.url }}"></a>
+                    {% if user.is_authenticated %}
+                    <form action="{% url 'add_wish_list' item.id %} " method="get">
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <div style="position: absolute; top: 0; left: 0; padding: 5px;">
+                            <button type="submit" style="border: none; background: none; cursor: pointer;">
+                                <i style="font-size: 20px;" class="fa fa-heart{% if item in wish_list_products %} text-danger{% else %} text-light{% endif %}" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <form action="{% url 'add_wish_list' item.id %} " method="get">
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <div style="position: absolute; top: 0; left: 0; padding: 5px;">
+                            <button type="submit" class="btn btn-light" style="border: none; background: none; cursor: pointer;">
+                                <i style="font-size: 20px;"  class="fa fa-heart" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
+                
+                <figcaption class="info-wrap">
+
+                <div class="fix-height" style="height: 50px;">
                     <a href="{{ item.get_url }}" class="title">{{ item.product_name }}</a>
-                    <div class="price-wrap mt-2">
-                        <span class="price" style="font-size: medium;">
+                    <div class="price-wrap" style="margin-bottom: 0;" >
+                            <span class="price " style="margin: 0;font-size: medium;">
+                            
                             {% with first_variation=item.variation_set.first %}
-                            {% if item.offer %}                           
-                            ${{first_variation.offer_price}}                        
-                            <del class="price-old">  ${{first_variation.price}}</del> <span style="color: rgb(11, 122, 85);font-size: small;"> {{item.offer.discount.discount}}% offer</span></span>
-                            {% else %}                            
-                            ${{ first_variation.price }}
-                            {% endif %}
-                        {% endwith %}
-                       
-                       
+                                {% if item.offer %}                           
+                                    ${{first_variation.offer_price}}                        
+                                    <del style="margin: 0;" class="price-old">  ${{first_variation.price}}</del> 
+                                    <span style="margin: 0;color: rgb(11, 122, 85);font-size: small;"> {{item.offer.discount.discount}}% offer</span></span>
+                                {% else %}                            
+                                    <span style="margin: 0;">${{ first_variation.price }}</span>
+                                {% endif %}
+                            {% endwith %}   
+                            
+                            
+                        
+                                
                     </div> <!-- price-wrap.// -->
                 </div>
-                <a href="{{ item.get_url }}" class="btn btn-block btn-primary">View details</a>
+                <div class="mb-1">
+                        <span class="mb-1">
+                            <i class="fa fa-star{% if item.averageReview == 0.5 %}-half-o{% elif item.averageReview < 1 %}-o {% endif %}" style="color: gold;"></i>
+                            <i class="fa fa-star{% if item.averageReview == 1.5 %}-half-o{% elif item.averageReview < 2 %}-o {% endif %}" style="color: gold;"></i>
+                            <i class="fa fa-star{% if item.averageReview == 2.5 %}-half-o{% elif item.averageReview < 3 %}-o {% endif %}" style="color: gold;"></i>
+                            <i class="fa fa-star{% if item.averageReview == 3.5 %}-half-o{% elif item.averageReview < 4 %}-o {% endif %}" style="color: gold;"></i>                              
+                            <i class="fa fa-star{% if item.averageReview == 4.5 %}-half-o{% elif item.averageReview < 5 %}-o {% endif %}" style="color: gold;"></i> 
+                            </span>
+                        
+                </div>
+                <a href="{{ item.get_url }}"  class="btn btn-block btn-primary ">View details</a>
             </figcaption>
         </figure>
-    </div> <!-- col.// -->
+            </div> <!-- col.// -->
+            {% endif %}
+            {% endfor %}
+       
+        
+
+            
+    </div> <!-- row end.// -->
+    {% else %}
+    <div class="row">
+            
+        {% for item in filter_variations %}
+        
+        <div class="col-md-4 d-flex justify-content-center align-items-center text-center">
+        <figure class="card card-product-grid">
+            <div class="img-wrap" style="position: relative;">
+                <a href="{{ item.get_url }}"><img src="{{ item.product.images.url }}"></a>
+                {% if user.is_authenticated %}
+                <form action="{% url 'add_wish_list' item.product.id %} " method="get">
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <div style="position: absolute; top: 0; left: 0; padding: 5px;">
+                        <button type="submit" style="border: none; background: none; cursor: pointer;">
+                            <i style="font-size: 20px;" class="fa fa-heart{% if item.product in wish_list_products %} text-danger{% else %} text-light{% endif %}" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </form>
+                {% else %}
+                <form action="{% url 'add_wish_list' item.product.id %} " method="get">
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <div style="position: absolute; top: 0; left: 0; padding: 5px;">
+                        <button type="submit" class="btn btn-light">
+                            <i class="fa fa-heart" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+            
+            <figcaption class="info-wrap">
+
+            <div class="fix-height" style="height: 50px;">
+                <a href="{{ item.get_url }}" class="title">{{ item.product.product_name }}</a>
+                <div class="price-wrap" style="margin-bottom: 0;" >
+                        <span class="price " style="margin: 0;font-size: medium;">
+                            {% if item.product.offer %}                           
+                                ${{item.offer_price}}                        
+                                <del style="margin: 0;" class="price-old">  ${{item.price}}</del> 
+                                <span style="margin: 0;color: rgb(11, 122, 85);font-size: small;"> {{item.product.offer.discount.discount}}% offer</span></span>
+                            {% else %}                            
+                                <span style="margin: 0;">${{ item.price }}</span>
+                            {% endif %}
+                        
+                        
+                        
+                    
+                            
+                </div> <!-- price-wrap.// -->
+            </div>
+            <div class="mb-1">
+                    <span class="mb-1">
+                        <i class="fa fa-star{% if item.product.averageReview == 0.5 %}-half-o{% elif item.product.averageReview < 1 %}-o {% endif %}" style="color: gold;"></i>
+                        <i class="fa fa-star{% if item.product.averageReview == 1.5 %}-half-o{% elif item.product.averageReview < 2 %}-o {% endif %}" style="color: gold;"></i>
+                        <i class="fa fa-star{% if item.product.averageReview == 2.5 %}-half-o{% elif item.product.averageReview < 3 %}-o {% endif %}" style="color: gold;"></i>
+                        <i class="fa fa-star{% if item.product.averageReview == 3.5 %}-half-o{% elif item.product.averageReview < 4 %}-o {% endif %}" style="color: gold;"></i>                              
+                        <i class="fa fa-star{% if item.product.averageReview == 4.5 %}-half-o{% elif item.product.averageReview < 5 %}-o {% endif %}" style="color: gold;"></i> 
+                        </span>
+                    
+            </div>
+            <a href="{{ item.product.get_url }}"  class="btn btn-block btn-primary ">View details</a>
+        </figcaption>
+    </figure>
+        </div> <!-- col.// -->
+        
+        {% endfor %}      
+</div> <!-- row end.// -->    
     {% endif %}
 
-    {% endfor %}
+    {% if not filters %}
+<div class="row" style="align-items: center;">
+    <div class="col"></div>
+    <div class="col"><div class="pagination" style="align-items: center;">
+        <span class="step-links">
+            {% if products.has_previous %}
+                <span style="color: red;font-size: large;"><a href="?page=1">&laquo; First </a></span><span>
+                <span style="font-size: large;"><a class="text-danger" href="?page={{ products.previous_page_number }}">Previous </a></span>
+            {% endif %}
 
-        
-    </div> <!-- row end.// -->
+            <span class="current-page" style="font-size: large;">Page{{ products.number }} of {{ products.paginator.num_pages }} </span>
+
+            {% if products.has_next %}
+                <span style="font-size: large;"><a class="text-danger" href="?page={{ products.next_page_number }}">Next </a></span>
+                <span style="font-size: large;"><a href="?page={{ products.paginator.num_pages }}"> Last &raquo;</a></span>
+            {% endif %}
+        </span>
+    </div></div>
+    <div class="col"></div>
     
-    
-    
-    <nav class="mt-4" aria-label="Page navigation sample">
-      <ul class="pagination">
-        <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item"><a class="page-link" href="#">Next</a></li>
-      </ul>
-    </nav>
-    
-        </main> <!-- col.// -->
+</div>
+{% endif %}
+ </main> <!-- col.// -->
     
     </div>
     

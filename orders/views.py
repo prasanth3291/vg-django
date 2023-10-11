@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from django.shortcuts import HttpResponse,get_object_or_404
+from django.shortcuts import HttpResponse,get_object_or_404,HttpResponseRedirect
 from django.http import JsonResponse
 from carts.models import CartItem,UserCoupons
 from store.models import Product,com_offers
@@ -22,70 +22,103 @@ from django.db.models import Q
 
 # Create your views here.
 def payments(request,order_number):
-    print(123)
-    # Create a payment record
-    body=json.loads(request.body)
-    order=Order.objects.get(user=request.user,is_ordered=False,order_number=body['orderID'])
-    #order=Order.objects.get(user=request.user,is_ordered=False,order_number=order_number)
-    payment=Payment(
-        user=request.user,
-        payment_id=body['transID'],
-        payment_method=body['payment_method'],
-        amount_paid=order.order_total,
-        status=body['status']               
-    )
-    payment.save()
-    order.payment=payment
-    order.is_ordered=True
-    order.status='Accepted'
-    order.save()
-    print("payment")
+    
+    if request.method == 'POST':
+        
+        payment_name = request.POST.get('payment_method')
+        print(payment_name)
+        if payment_name == 'COD':
+            order=Order.objects.get(user=request.user,is_ordered=False,order_number=order_number)
+            unique_id = f"COD{order_number}"
+            payment=Payment(
+                user=request.user,
+                payment_id=unique_id,
+                payment_method=payment_name,
+                amount_paid=0,
+                status=payment_name      
+                    )
+            payment.save()
+            
+        else:
+           
+            # Create a payment record
+            body=json.loads(request.body)
+            order=Order.objects.get(user=request.user,is_ordered=False,order_number=body['orderID'])
+            #order=Order.objects.get(user=request.user,is_ordered=False,order_number=order_number)
+            payment=Payment(
+                user=request.user,
+                payment_id=body['transID'],
+                payment_method=body['payment_method'],
+                amount_paid=order.order_total,
+                status=body['status']               
+                    )
+            payment.save()
+                
+        order.payment=payment
+        order.is_ordered=True
+        order.status='Accepted'
+        order.save()
+        print("payment")
 
-     #  ove the cart items to the order product table
-    cart_items=CartItem.objects.filter(user=request.user)
-    for i in cart_items:
-        print ("name:",i.product.product_name)
+        #  ove the cart items to the order product table
+        cart_items=CartItem.objects.filter(user=request.user)
+        for i in cart_items:
+            print ("name:",i.product.product_name)
+            
+        for item in cart_items:
+            price=item.variations.offer_price if item.variations.offer_price is not None else item.variations.price
+            orpr=OrderProduct()
+            orpr.order_id=order.id
+            orpr.payment=payment
+            orpr.user_id=request.user.id
+            orpr.product_id=item.product_id
+            orpr.quantity=item.quantity        
+            orpr.product_price =price 
+            orpr.total=price*item.quantity
+            orpr.ordered=True        
+            orpr.save()        
+            orderproduct=OrderProduct.objects.get(id=orpr.id)
+            orderproduct.variations=item.variations
+            orderproduct.save()
+            
+            # reduce quantity of the product
+            product=Product.objects.get(id=item.product_id)    
+            variation=item.variations
+            variation.stock -=item.quantity
+            variation.save()    
+        CartItem.objects.filter(user=request.user).delete()    
         
-    for item in cart_items:
-        price=item.variations.offer_price if item.variations.offer_price is not None else item.variations.price
-        orpr=OrderProduct()
-        orpr.order_id=order.id
-        orpr.payment=payment
-        orpr.user_id=request.user.id
-        orpr.product_id=item.product_id
-        orpr.quantity=item.quantity        
-        orpr.product_price =price 
-        orpr.total=price*item.quantity
-        orpr.ordered=True        
-        orpr.save()        
-        orderproduct=OrderProduct.objects.get(id=orpr.id)
-        orderproduct.variations=item.variations
-        orderproduct.save()
+        mail_subject='Thank you for your order'
+        message=render_to_string('orders/order_recieved_email.html',{
+                                            'user':request.user,
+                                        'order':order
+                                        })                               
+                                        
+        to_email=request.user.email
+        send_email=EmailMessage(mail_subject,message,to=[to_email])
+        send_email.send()
         
-        # reduce quantity of the product
-        product=Product.objects.get(id=item.product_id)    
-        variation=item.variations
-        variation.stock -=item.quantity
-        variation.save()    
-    CartItem.objects.filter(user=request.user).delete()    
-    
-    mail_subject='Thank you for your order'
-    message=render_to_string('orders/order_recieved_email.html',{
-                                        'user':request.user,
-                                      'order':order
-                                    })                               
-                                      
-    to_email=request.user.email
-    send_email=EmailMessage(mail_subject,message,to=[to_email])
-    send_email.send()
-    
-    data={
-        'order_number':order.order_number,
-        'transID':payment.payment_id,
-        
-    }
-    return JsonResponse(data)
-    
+        data={
+            'order_number':order.order_number,
+            'transID':payment.payment_id,
+            
+        }
+        if payment_name != 'COD':
+            print('olakka')
+            return JsonResponse(data)
+        else:
+            transID = payment.payment_id
+            redirect_url = '/orders/order_complete'
+            query_string = f'?order_number={order_number}&payment_id={transID}'
+            redirect_url_with_params = redirect_url + query_string
+
+            # Redirect to the constructed URL
+            return HttpResponseRedirect(redirect_url_with_params)
+
+
+
+
+       
     
     
    
@@ -211,6 +244,9 @@ def place_order(request,total=0,quantity=0):
                     order_det.tax = tax 
                     order_det.grand_total = grand_total
                     order_det.save()
+                    order1.order_total = grand_total
+                    order1.tax = tax
+                    order1.save()
             except:
                 pass    
             order=Order.objects.get(user=current_user,is_ordered=False,order_number=order_number)    
@@ -295,6 +331,9 @@ def place_order(request,total=0,quantity=0):
                         order_det.tax = tax 
                         order_det.grand_total = grand_total
                         order_det.save()
+                        data.order_total=grand_total
+                        data.tax=tax
+                        data.save()
                 except:
                     pass  
                 order=Order.objects.get(user=current_user,is_ordered=False,order_number=order_number)
@@ -350,19 +389,23 @@ def cancel_order(request,order_number):
                 i.save()      
             if request.user.is_admin:
                 return redirect('orders') 
+        try:
+            order.reason_for_cancellation = request.POST.get('reason')
+            order.save()
+        except Order.DoesNotExist:
+            pass    
             
         #here wallet
         try:
             wallet=Wallet.objects.get(user=request.user)
-            if order.status == 'Cancelled':
+            if order.status == 'Cancelled' and payment.payment_method == 'PayPal':
                amount=order.order_total
                wallet.add_fund(amount)
                description=f"Refund for order #{order.order_number}"
                transaction=Transaction(wallet=wallet,amount=amount,description=description,balance=wallet.balance)
                transaction.save()
         except Wallet.DoesNotExist:
-            pass           
-           
+            pass  
             return redirect('user_dashboard')
     if request.user.is_admin:
                 return redirect('orders')             
@@ -541,6 +584,8 @@ def generate_invoice_pdf(request,order_id):
     response = HttpResponse(pdf.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="invoice.pdf"'
     return response
+
+
 
 
         

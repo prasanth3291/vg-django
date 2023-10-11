@@ -30,7 +30,9 @@ urlpatterns = [
     path('delete_category_offer/<int:offer_id>/',views.delete_category_offer,name='delete_category_offer'),
     path('edit_minimum_purchaseoffer/<int:offer_id>/',views.edit_minimum_purchase_offer,name='edit_minimum_purchase_offer'),
     path('add_minimum_purchase_offer',views.add_minimum_purchase_offer,name='add_minimum_purchase_offer'),
-    path('delete_minimum_purchase_offer/<int:offer_id>/',views.delete_minimum_purchase_offer,name='delete_minimum_purchase_offer')
+    path('delete_minimum_purchase_offer/<int:offer_id>/',views.delete_minimum_purchase_offer,name='delete_minimum_purchase_offer'),
+    path('sales_report',views.sales_report,name='sales_report'),
+    path('generate_sales_report_pdf', views.generate_sales_report_pdf, name='generate_sales_report_pdf'),
      
 
      

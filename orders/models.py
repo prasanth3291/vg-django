@@ -47,6 +47,7 @@ class Order(models.Model):
     # offers and coupons
     offers=models.ForeignKey(com_offers, on_delete=models.CASCADE,blank=True,null=True)
     discount=models.DecimalField( max_digits=10, decimal_places=2,default=0)
+    reason_for_cancellation = models.TextField(max_length=150,blank=True,null=True)
     
     
     
@@ -83,6 +84,11 @@ class order_details(models.Model):
     tax = models.FloatField()
     grand_total = models.FloatField()
     status=models.BooleanField(default=False)
+    def total_discount(self):
+        total_discounts = self.discount_from_coupons + self.discount_from_offers
+        return total_discounts
+        
+    
     
     
     

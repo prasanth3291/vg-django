@@ -4,10 +4,261 @@
 
 {% block content %}
 
-
-
-
+</head>
+<body>
+     <!-- Sale & Revenue Start -->
+     <div class="container-fluid pt-4 px-4 mb-4">
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                    <i class="fa fa-chart-line fa-3x text-success"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Today Sale</p>
+                        <h6 class="mb-0">${{today_sales|floatformat:2}}</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                    <i class="fa fa-chart-bar fa-3x text-success"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Total Sale</p>
+                        <h6 class="mb-0">${{total_sales|floatformat:2}}</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                    <i class="fa fa-chart-area fa-3x text-success"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Today Orders</p>
+                        <h6 class="mb-0">{{today_orders}}</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                    <i class="fa fa-chart-pie fa-3x text-success"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Total Orders</p>
+                        <h6 class="mb-0">{{total_orders}}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row mb-4 p-4">
+            <!-- First Column -->
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4 class="text-center mt-2">Growth</h4>
+                    <canvas id="myChart3"></canvas>
+                </div>
+            </div>
            
+            <!-- Second Column -->
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4 class="text-center mt-2">Transaction</h4>
+                    <canvas id="myChart2"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="row  p-4">
+            <!-- Third Column -->
+            <div class="col-md-4" >
+                <div class="chart-container">
+                    <h4 class="text-center mt-2">Category wise sales report</h4>
+                    <canvas  id="myChart1" width="100" height="100"></canvas>
+                    
+                </div>
+            </div>
+            
+            <!-- Fourth Column -->
+            <div class="col-md-8 mt-4">
+                <div class="col-lg-12 d-flex align-items-stretch ">
+                    <div class="card w-100 ">
+                      <div class="card-body p-4">
+                        <h5 class="card-title fw-semibold mb-4">Recent Transactions</h5>
+                        <div class="table-responsive">
+                          <table class="table text-nowrap mb-0 align-middle">
+                            <thead class="text-dark fs-4" style="background-color: rgb(14, 172, 120);">
+                              <tr>
+                                <th class="border-bottom-0">
+                                  <h6 class="fw-semibold mb-0 " style="color: aliceblue;">Order number </h6>
+                                </th>
+                                <th class="border-bottom-0">
+                                  <h6 class="fw-semibold mb-0" style="color: aliceblue;">Customer</h6>
+                                </th>                              
+                                <th class="border-bottom-0">
+                                  <h6 class="fw-semibold mb-0" style="color: aliceblue;">Payment <br> method</h6>
+                                </th>
+                                <th class="border-bottom-0">
+                                  <h6 class="fw-semibold mb-0" style="color: aliceblue;">Order Total</h6>
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                              <tr>
+                                <td class="border-bottom-0"><h6 class="fw-semibold mb-0">#{{order.order_number}}</h6></td>
+                                <td class="border-bottom-0">
+                                    <h6 class="fw-semibold mb-1">{{order.user}}</h6>
+                                                           
+                                </td>
+                              
+                                <td class="border-bottom-0">
+                                  <div class="d-flex align-items-center gap-2">
+                                    <span class="badge {% if order.payment.payment_method == 'COD' %} bg-danger {% else %}
+                                    bg-success{% endif %} rounded-3 fw-semibold">{{order.payment.payment_method}}</span>
+                                  </div>
+                                </td>
+                                <td class="border-bottom-0">
+                                  <h6 class="fw-semibold mb-0 fs-6">{{order.order_total|floatformat:2}}</h6>                                    
+                                </td>
+                              </tr>     
+                              {% endfor %}                          
+                                                   
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Chart.js library and script to create charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Your chart initialization code here, referencing the unique IDs
+        var categoryNames = JSON.parse('{{ category_name_json|escapejs }}');
+        var categoryCounts = JSON.parse('{{ category_count_json|escapejs }}');
+        var barColors = ["red", "green", "blue"];
+        
+        
+        // Create a bar chart for myChart1
+        var ctx1 = document.getElementById('myChart1').getContext('2d');
+        var myChart1 = new Chart(ctx1, {
+            type: 'pie',
+            data: {
+                labels: categoryNames,
+                datasets: [{
+                    label: 'Category Sales',
+                    data: categoryCounts,
+                    backgroundColor: barColors,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                aspectRatio: 1,
+                animation: false, // Disable animations                
+                barThickness: 50, // Change the bar width here
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                },
+                title: {
+                    display: true,
+                    text: "Category Sales Report"
+                }
+            }
+
+            // Chart configuration for the first chart
+        });
+
+        // Create a bar chart for myChart2
+        var transaction_type = JSON.parse('{{ transaction_type_json|escapejs }}');
+        var transaction_count = JSON.parse('{{ transaction_count_json|escapejs }}'); 
+
+        var ctx2 = document.getElementById('myChart2').getContext('2d');
+        var myChart2 = new Chart(ctx2, {
+            // Chart configuration for the second chart
+            type: 'bar',
+            data: {
+                labels: transaction_type,
+                datasets: [{
+                    label: 'Transaction',
+                    data: transaction_count,
+                    
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                animation: false, // Disable animations
+                scales: {
+                    y: {
+                        ticks: {
+                            stepSize: 2, // Change step size here
+                            beginAtZero: true // Set to true to start at 0
+                        }
+                    }
+                },
+                barThickness: 50, // Change the bar width here
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                title: {
+                    display: true,
+                    text: "Category Sales Report"
+                }
+            }
+        });
+
+        // Create a bar chart for myChart3
+        var order_date = JSON.parse('{{ order_date_json|escapejs }}');
+        var order_count = JSON.parse('{{ order_count_json|escapejs }}'); 
+        var ctx3 = document.getElementById('myChart3').getContext('2d');
+        var myChart3 = new Chart(ctx3, {
+            // Chart configuration for the third chart
+            type: 'line',
+            data: {
+                labels: order_date,
+                datasets: [{
+                    label: order_date,
+                    data: order_count,
+                    
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                animation: false, // Disable animations
+                scales: {
+                    y: {
+                        ticks: {
+                            stepSize: 1, // Change step size here
+                            beginAtZero: true // Set to true to start at 0
+                        }
+                    }
+                },
+                aspectRatio:2,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                title: {
+                    display: true,
+                    text: "Category Sales Report"
+                }
+            }
+        });
+
+        // Create a bar chart for myChart4
+        var ctx4 = document.getElementById('myChart4').getContext('2d');
+        var myChart4 = new Chart(ctx4, {
+            // Chart configuration for the fourth chart
+        });
+    </script>
+</body>
 
 
 {% endblock %}

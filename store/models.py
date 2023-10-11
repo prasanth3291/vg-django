@@ -115,8 +115,8 @@ class Variation(models.Model):
     stock           =models.IntegerField(default=0) 
     is_active=models.BooleanField(default=True)
     created_date=models.DateField(auto_now_add=True)    
-    #def __str__(self):
-       # return self.variation_value
+    def __str__(self):
+       return self.product.product_name
        
 
        

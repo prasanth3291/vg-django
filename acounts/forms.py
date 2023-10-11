@@ -1,5 +1,6 @@
 from django import forms
 from .models import Acount,UserProfile,Adress,Referal_code,ReviewRating
+from django.contrib.auth.models import User
 
 class RegistrationForms(forms.ModelForm):
     password=forms.CharField(widget=forms.PasswordInput(attrs={'placeholder' : 'enter password'})) 
@@ -25,8 +26,8 @@ class RegistrationForms(forms.ModelForm):
        if password != confirm_password:
            raise forms.ValidationError(
                'password does not match'
-               
-           ) 
+               )     
+           
     def __init__(self,*args, **kwargs) :
         super(RegistrationForms,self).__init__(*args,**kwargs)
         for field in self.fields:

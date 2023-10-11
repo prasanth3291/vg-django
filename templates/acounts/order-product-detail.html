@@ -46,10 +46,27 @@
             
             <div class="row" style="margin: 5px;">
               <form method="post" action="{% url 'cancel_order' order.order_number %}">
-                {% csrf_token %} <!-- Include this for CSRF protection -->
-              <button class="btn btn-outline-primary" type="submit">Cancel order</button>
+                {% csrf_token %} 
+                <p>                 
+                  <button class="btn btn-outline-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                    Cancel Order
+                  </button>
+                </p>
+                <div class="collapse" id="collapseExample">
+                  
+                    <input type="text" style="width: 400px;" name="reason"><!-- Include this for CSRF protection -->
+                    <button class="btn btn-danger" onclick="return confirm('Ares you sure you want cancell this item')" type="submit">Cancel</button>
+                  
+                </div>
+                
+                
             </form>
+            
             </div>
+            {% endif %}
+            {% if order.status == 'Cancelled' %}
+            <h4>Order is Cancelled</h4>
+            <h6>Reason for cancellation: {{order.reason_for_cancellation}}</h6>
             {% endif %}
             
 

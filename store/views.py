@@ -11,6 +11,7 @@ from acounts.models import ReviewRating
 from acounts.forms import ReviewForm
 from django.contrib import messages
 from orders.models import OrderProduct
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 @never_cache
 def store(request,category_slug=None):
     categories=None
@@ -20,17 +21,36 @@ def store(request,category_slug=None):
     if category_slug !=None :        
         category_slug = category_slug.strip()
         categories=get_object_or_404(category,slug=category_slug)
-        products=Product.objects.all().filter(category=categories,is_available=True).order_by('id')
+        product=Product.objects.all().filter(category=categories,is_available=True).order_by('id')
         product_count=products.count()
    
     else:    
-        products=Product.objects.all().filter(is_available=True)        
-        product_count=products.count()
-  
+        product=Product.objects.all().filter(is_available=True)        
+        product_count=product.count()
+    wish_list_products=[]
+    try:
+    
+        user=request.user
+        if user.is_authenticated:
+            
+            wish_list=user.wishlist_set.all()
+            for item in wish_list:
+                wish_list_products.append(item.products)
+    except :
+        pass 
+    page = request.GET.get('page')
+    paginator = Paginator(product, 6)
+    try:
+        products = paginator.page(page)
+    except PageNotAnInteger:
+        products = paginator.page(1)
+    except EmptyPage:
+        products = paginator.page(paginator.num_pages)
+
     context= {
         'products':products,
         'product_count':product_count,
-        
+        'wish_list_products':wish_list_products        
         
     }
     return render(request,('store/store.html'),context)
@@ -75,7 +95,8 @@ def product_detail(request,category_slug,Product_slug):
     except:
         pass  
     # end oos    
-    for variation in single_product.variation_set.all():
+    variation_for_preselection = Variation.objects.filter(product=single_product,stock__gt=0)
+    for variation in variation_for_preselection:
         if variation.color.color_name not in unique_color:
             unique_color.add(variation.color.color_name)
             var_size=Variation.objects.filter(product=single_product,color=variation.color)
@@ -108,7 +129,8 @@ def product_detail(request,category_slug,Product_slug):
     try:
         reviews=ReviewRating.objects.filter(product=single_product)
     except ReviewRating.DoesNotExist:
-        pass                 
+        pass    
+                 
             
     context={
         'single_product':single_product,
@@ -231,6 +253,9 @@ def filter_products(request):
 
     # Create a queryset to filter products based on the selected criteria
     products = Product.objects.all()  # Start with all products
+    print(products)
+    for item in products:
+        print(item.variation_set.all())
 
     if category:
         products = products.filter(category__in=category)
@@ -246,22 +271,54 @@ def filter_products(request):
         products = products.filter(id__in=product_ids)
 
     if min_price:
-        variations = Variation.objects.filter(price__gte=min_price)
+        variations = Variation.objects.filter(Q(offer_price__isnull=False, offer_price__gte=min_price) 
+                                              | Q(offer_price__isnull=True, price__gte=min_price))
         product_ids = variations.values_list('product_id', flat=True)
         products = products.filter(id__in=product_ids)
+    print(products) 
+    for item in products:
+        print(item.variation_set.all())
+      
 
     if max_price:
-        variations = Variation.objects.filter(price__lte=max_price)
+        if min_price:
+            variations = variations.filter(Q(offer_price__isnull=False, offer_price__lte=max_price) 
+                                | Q(offer_price__isnull=True, price__lte=max_price))
+        else:    
+            variations = Variation.objects.filter(price__lte=max_price)
         product_ids = variations.values_list('product_id', flat=True)
         products = products.filter(id__in=product_ids)
 
     product_count = products.count()
+    print(products)
+    for item in products:
+        print(item.variation_set.all())
     
-    
+    print(variations)
     print(filters['size'])
     cat=filters['size']
     print(cat)
     print(min_price)
+    filter_products= []
+    filter_variations= []
+    for var in variations:
+        if var.product not in filter_products:
+            filter_variations.append(var)
+            filter_products.append(var.product)
+    print(filter_products)
+    print(filter_variations)        
+    wish_list_products = []
+    try:
+    
+        user=request.user
+        if user.is_authenticated:
+            
+            wish_list=user.wishlist_set.all()
+            for item in wish_list:
+                wish_list_products.append(item.products)
+
+    except :
+        pass 
 
     # Create an instance of the ProductFilterForm with initial values from session data
 
@@ -269,7 +326,9 @@ def filter_products(request):
         'products': products,
         'product_count': product_count,        
         'filters':filters,
-        'min_price':min_price
+        'min_price':min_price,
+        'filter_variations':filter_variations,
+        'wish_list_products':wish_list_products
     }
 
     return render(request, 'store/store.html', context)

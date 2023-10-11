@@ -36,8 +36,21 @@
                   <h6>Payment Method</h6>
                 </div>
                 <div class="card-body">
+
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="paymentMethod" id="cashOnDeliveryRadio">
+                    <label class="form-check-label" for="flexRadioDefault1">
+                      Cash on delivery
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="paymentMethod" id="paypalRadio" checked>
+                    <label class="form-check-label" for="flexRadioDefault2">
+                      Paypal
+                    </label>
+                  </div>
                 
-                  <p class="card-text" style="font-weight: 500;">PayPal</p>
+                  
                   
                 </div>
                 
@@ -144,9 +157,18 @@
                 
                 <p class="text-center mb-3">
                     <img src="/static/images/misc/payments.png" height="26">
-                    <div id="paypal-button-container">
+                    <div style="display: block;" id="paypal-button-container"></div>
+                    <div id="cashOnDeliveryContent" style="display: none;">
+                      <form action="{% url 'payments' order.order_number %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden"  name="payment_method" value="COD">
 
-                    </div>
+                        <button  type="submit" class="btn btn-primary" style="width:100%;">Cash on delivery</button></div>
+                      </form>
+                      
+
+
+                    
                     <!-- Place 
                     <form method="post" action="{% url 'payments' order_number=order.order_number %}">
                         {% csrf_token %}
@@ -238,6 +260,29 @@
             }
             }).render('#paypal-button-container');
 </script>
+
+<script>
+$(document).ready(function() {
+  // Initially hide the Cash on Delivery content
+  $('#cashOnDeliveryContent').hide();
+
+  // Handle radio button change event
+  $('input[name="paymentMethod"]').change(function() {
+    var selectedValue = $('input[name="paymentMethod"]:checked').attr('id');
+
+    if (selectedValue === 'cashOnDeliveryRadio') {
+      // Show Cash on Delivery content
+      $('#cashOnDeliveryContent').show();
+      $('#paypal-button-container').hide();
+    } else if (selectedValue === 'paypalRadio') {
+      // Show Paypal content
+      $('#cashOnDeliveryContent').hide();
+      $('#paypal-button-container').show();
+    }
+  });
+});
+</script>
+
 
 
 {% endblock %}

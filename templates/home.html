@@ -23,7 +23,7 @@
 <div class="container">
 
 <header class="section-heading" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
-	<a href="./store.html" class="btn btn-outline-primary float-right">See all</a>
+	
 	<h3 class="section-title">Popular products</h3>
 </header><!-- sect-heading -->
 
@@ -38,7 +38,7 @@
 			<a href="{{item.get_url}}" class="img-wrap"> <img src="{{item.images.url}}"> </a>
 			<figcaption class="info-wrap">
 				<a href="{{item.get_url}}" class="title">{{item.product_name}}</a>
-				<div class="price mt-1">{% with price=item.variation_set.first %} ${{price.price}} {% endwith %}</div> <!-- price-wrap.// -->
+				
 			</figcaption>
 		</div>
 	</div> <!-- col.// -->

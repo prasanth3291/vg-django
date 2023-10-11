@@ -333,12 +333,12 @@
                               {% if offer_discount %}
                               <dl class="dlist-align text-success">
                                 <dt id="offer-discount-1" style="display: block;">Discount from offer:</dt>
-                                <dd class="text-right" id="offer-discount" style="display: block;"> {{offer_discount}}</dd>
+                                <dd class="text-right" id="offer-discount" style="display: block;"> {{offer_discount|floatformat:2}}</dd>
                               </dl>
                               {% endif %}                              
                               <dl class="dlist-align text-success">
                                 <dt id="offer-discount-new-1" style="display: none;">Discount from offer:</dt>
-                                <dd class="text-right" id="offer-discount-new" style="display: none;"> {{offer_discount}}</dd>
+                                <dd class="text-right" id="offer-discount-new" style="display: none;"> {{offer_discount|floatformat:2}}</dd>
                               </dl>
                               <hr>
                               <dl class="dlist-align">

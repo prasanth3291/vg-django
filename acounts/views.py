@@ -8,7 +8,6 @@ from django.shortcuts import HttpResponse
 from orders.models import Order,Payment,OrderProduct
 from store.models import Product,Variation
 import urllib.parse
-
 # user verification
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
@@ -16,12 +15,10 @@ from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
-
 #new 
 import os
 from twilio.rest import Client
 import random
-
 # for cart checkout
 from carts.views import Carts,cart_id
 from carts.models import Carts,CartItem
@@ -32,14 +29,20 @@ def generate_random_otp():
     otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
     return otp
 
-
-
-
 def register(request):
     if request.method=='POST':
         form=RegistrationForms(request.POST)
         if form.is_valid():
-            print("form valid")
+            # check for referal codes
+            referal_codes=[]
+            referal_code=form.cleaned_data['reference_code']      
+            referal_codes = Acount.objects.values_list('Referal_code', flat=True)   
+        
+            if referal_code:  
+                if referal_code not in referal_codes:
+                    messages.error(request,"Invalid coupon")    
+                    return redirect('register')  
+            #create acount    
             first_name=form.cleaned_data['first_name']            
             last_name=form.cleaned_data['last_name']        
             phone_number=form.cleaned_data['phone_number']            
@@ -48,18 +51,15 @@ def register(request):
             username=email.split('@')[0]        
             user=Acount.objects.create_user(first_name=first_name,last_name=last_name,email=email,username=username,password=password)
             user.phone_number=phone_number
-            user.save()            
-            # check for referal codes
+            user.save()       
             try:
-                referal_code=form.cleaned_data['reference_code']                      
+                     
                 if referal_code:
                     referred_by=Acount.objects.get(Referal_code=referal_code)
                     code=Referal_code.objects.create(code=referal_code,referrer_user=referred_by,referred_user=user,
                                                      gift_money=5)   
             except :
-                print('except')
-                pass        
-                    
+                pass          
            # acount activation
             token=default_token_generator.make_token(user)
             current_site=get_current_site(request)
@@ -73,39 +73,32 @@ def register(request):
                                       
             to_email=email
             send_email=EmailMessage(mail_subject,message,to=[to_email])
-            send_email.send()           
-            
+            send_email.send()         
             # check otp verification
-            otp=generate_random_otp()
-            account_sid = "ACd61c3ec36ca81a50af865490b6342a4a"
-            auth_token = "f0fa28e0bdcb634f215ded0de20a4efb"
-            client = Client(account_sid, auth_token)
-            message = client.messages \
-                .create(
-                     body=render_to_string('acounts/acount_verification_email.html',{
-                                        'user':user,
-                                      'domain':current_site,
-                                      'uid':urlsafe_base64_encode(force_bytes(user.pk)),
-                                      'token':token,  
-                                    })                               
-                                      ,
-                     from_='+15862570025',
-                     to=phone_number
-                 )
-            print(message.sid)    
-            
-            
+            #otp=generate_random_otp()
+            #account_sid = "ACd61c3ec36ca81a50af865490b6342a4a"
+            #auth_token = "b1dbed12c31dd41519368261f3dbd7fd"
+            #client = Client(account_sid, auth_token)
+            #message = client.messages \
+            #   .create(
+            #       body=render_to_string('acounts/acount_verification_email.html',{
+            #                            'user':user,
+            #                          'domain':current_site,
+            #                          'uid':urlsafe_base64_encode(force_bytes(user.pk)),
+            #                          'token':token,  
+            #                        })                               
+            #                          ,
+            #         from_='+15862570025',
+            #         to=phone_number
+            #    )
+            #print(message.sid)    
             # messages.success(request,'Thank you for regestering with us,we have sent an verification link to your Email adress.Please verify it..')
             return redirect ('/acounts/login/?command=verification&email='+email)
-    else:
-        print("form not valid")
-        form=RegistrationForms()        
-    
+    else:        
+        form=RegistrationForms() 
     context={
         'form': form
     }
-    
-    
     return render(request,'acounts/register.html',context)
 
 from django.views.decorators.cache import never_cache
@@ -114,15 +107,14 @@ def login(request):
     if request.user.is_authenticated:
         user=request.user
         if user.is_superadmin:
-                return render(request,'admins/dashboard.html')
+                return redirect('ad_dashboard')
         else:            
             return redirect ('user_dashboard')    
     
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
-        user=auth.authenticate(email=email,password=password)
-        
+        user=auth.authenticate(email=email,password=password)        
         if user is not None:            
             try:
                 cart=Carts.objects.get(cart_id=cart_id(request))
@@ -133,8 +125,7 @@ def login(request):
                     product_variation=[]
                     for item in cart_item:
                         variation=item.variations
-                        product_variation.append(variation) 
-                    
+                        product_variation.append(variation)                     
             # exis. variation --> from database            
             # current variations--> from product variation            
             #item id--> from db
@@ -158,31 +149,22 @@ def login(request):
                             cart_item=CartItem.objects.filter(cart=cart)
                             for item in cart_item:
                                 item.user=user
-                                item.save()
-                
+                                item.save()                
             except:
-                pass    
-            
-            auth.login(request,user)
-            
+                pass   
+            auth.login(request,user)            
             if user.is_superadmin:
-                return render(request,'admins/dashboard.html')
+                return redirect('ad_dashboard')
             else:
                 messages.success(request,'User Successfully signed in')
                 url=request.META.get('HTTP_REFERER')
-                print('url=',url)
                 next_url = request.GET.get('next')
-                print('next',next_url)
                 try:
                     query=requests.utils.urlparse(url).query
-                  #  next_url = request.GET.get('next', 'wish_list')
-                   # print(next_url)
-                    
                     if query:
                         print('qry-->',query)
                         # we will split qry
                         params=dict(x.split('=') for x in query.split('&') )    
-                        
                         # this is for wishlist                        
                         url_value=params['next']      
                         if 'add_wish_list' in url_value:            
@@ -193,22 +175,18 @@ def login(request):
                                          
                         elif 'next' in params:                            
                             nextPage=params['next']
-                            print('ne',nextPage)
                             return redirect(nextPage)
                         else:                        
                             return redirect ('user_dashboard')
                     else:
                         return redirect('user_dashboard')    
                 except:
-                    print('hai')
-                    pass    
+                    pass   
                     
         else:
             messages.error(request,'invalid login credentials')
-            return redirect ('login')
-       
+            return redirect ('login')       
     return render(request,'acounts/login.html')
-
 
 @login_required(login_url='login')
 @never_cache
@@ -216,7 +194,6 @@ def logout(request):
     auth.logout(request)
     messages.success(request,'You are logged out')
     return redirect('login')
-
 
 # activate
 def activate(request,uidb64,token):
@@ -498,10 +475,7 @@ def add_wish_list(request, product_id=None):
             variation=variation,
         )
 
-    return redirect(next_url)
-
-    
-            
+    return redirect(next_url)           
 @login_required(login_url='login')        
 def wish_list(request):    
     if request.user.is_authenticated:    

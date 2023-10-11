@@ -51,8 +51,12 @@ def jackets_women(modeladmin, request, queryset):
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('product_name', 'modified_date', 'is_available', 'offer','category','subcategory')
     prepopulated_fields = {'slug': ('product_name',)}
-    actions = [apply_offer_men_shirts,jackets_women]  # Register the custom action
+    list_filter = ('is_deleted',)  # Add a filter for soft-deleted products
+    actions = ['undelete_selected',apply_offer_men_shirts,jackets_women]  # Define a custom action to undelete products
 
+    def undelete_selected(modeladmin, request, queryset):
+        queryset.update(is_deleted=False)  # Set is_deleted to False for selected products
+    undelete_selected.short_description = "Undelete selected products"  # Action description
 # Register the Product and Offer models with the admin site
 admin.site.register(Product, ProductAdmin)
 
