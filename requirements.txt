@@ -1,2 +1,2 @@
-"django" 
+
 "xhtml2pdf" 
