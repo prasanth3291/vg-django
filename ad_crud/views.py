@@ -15,17 +15,24 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa
 from io import BytesIO
 
-def ad_dashboard(request):   
-    completed_orders_by_category = category.objects.annotate(
-        completed_order_count = Sum(
-            F('product__variation__orderproduct__quantity'),
-            filter=Q(product__variation__orderproduct__order__status='Completed')))
+def ad_dashboard(request): 
+    try :  
+        completed_orders_by_category = category.objects.annotate(
+            completed_order_count = Sum(
+                F('product__variation__orderproduct__quantity'),
+                filter=Q(product__variation__orderproduct__order__status='Completed')))
+    except:
+        pass    
     category_name = []
     category_count = []
-    for categor in completed_orders_by_category:
-        category_name.append(categor.category_name)
-        category_count.append(float(categor.completed_order_count))     
-   
+    try :
+        for categor in completed_orders_by_category:
+            if categor.completed_order_count is not None:
+                category_name.append(categor.category_name)
+                category_count.append(float(categor.completed_order_count))     
+    except:
+        pass        
+    
     category_name_json = json.dumps(category_name)
     category_count_json = json.dumps(category_count)
     # fine transacxtion details
