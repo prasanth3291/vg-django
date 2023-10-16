@@ -5,20 +5,33 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('acounts', '0006_coupons_user'),
-        ('carts', '0001_initial'),
+        ("acounts", "0006_coupons_user"),
+        ("carts", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='UserCoupons',
+            name="UserCoupons",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('apllied', models.BooleanField(default=False)),
-                ('is_active', models.BooleanField(default=True)),
-                ('coupon', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='acounts.coupons')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("apllied", models.BooleanField(default=False)),
+                ("is_active", models.BooleanField(default=True)),
+                (
+                    "coupon",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="acounts.coupons",
+                    ),
+                ),
             ],
         ),
     ]

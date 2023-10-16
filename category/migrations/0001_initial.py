@@ -4,34 +4,54 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='category',
+            name="category",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('category_name', models.CharField(max_length=50, unique=True)),
-                ('slug', models.SlugField(max_length=100, unique=True)),
-                ('description', models.TextField(blank=True)),
-                ('cat_image', models.ImageField(blank=True, upload_to='pics/categories')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("category_name", models.CharField(max_length=50, unique=True)),
+                ("slug", models.SlugField(max_length=100, unique=True)),
+                ("description", models.TextField(blank=True)),
+                (
+                    "cat_image",
+                    models.ImageField(blank=True, upload_to="pics/categories"),
+                ),
             ],
             options={
-                'verbose_name': 'category',
-                'verbose_name_plural': 'categories',
+                "verbose_name": "category",
+                "verbose_name_plural": "categories",
             },
         ),
         migrations.CreateModel(
-            name='Sub_category',
+            name="Sub_category",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('sub_cat_name', models.CharField(max_length=50, unique=True)),
-                ('slug', models.SlugField(max_length=100, unique=True)),
-                ('categories', models.ManyToManyField(blank=True, to='category.category')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("sub_cat_name", models.CharField(max_length=50, unique=True)),
+                ("slug", models.SlugField(max_length=100, unique=True)),
+                (
+                    "categories",
+                    models.ManyToManyField(blank=True, to="category.category"),
+                ),
             ],
         ),
     ]

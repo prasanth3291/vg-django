@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('acounts', '0020_rename_wallet_transaction_wallet'),
+        ("acounts", "0020_rename_wallet_transaction_wallet"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='transaction',
-            old_name='timestamp',
-            new_name='date',
+            model_name="transaction",
+            old_name="timestamp",
+            new_name="date",
         ),
         migrations.AddField(
-            model_name='transaction',
-            name='balance',
+            model_name="transaction",
+            name="balance",
             field=models.DecimalField(decimal_places=2, default=2, max_digits=5),
             preserve_default=False,
         ),

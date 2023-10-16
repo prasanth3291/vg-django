@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('orders', '0006_order_details_status_alter_order_details_grand_total'),
+        ("orders", "0006_order_details_status_alter_order_details_grand_total"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='order',
-            name='reason_for_cancellation',
+            model_name="order",
+            name="reason_for_cancellation",
             field=models.TextField(blank=True, max_length=150, null=True),
         ),
     ]

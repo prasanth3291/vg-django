@@ -4,15 +4,14 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('acounts', '0019_remove_acount_wallet_money'),
+        ("acounts", "0019_remove_acount_wallet_money"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='transaction',
-            old_name='Wallet',
-            new_name='wallet',
+            model_name="transaction",
+            old_name="Wallet",
+            new_name="wallet",
         ),
     ]

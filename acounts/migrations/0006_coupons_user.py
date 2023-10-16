@@ -5,15 +5,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('acounts', '0005_remove_coupons_user'),
+        ("acounts", "0005_remove_coupons_user"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='coupons',
-            name='user',
-            field=models.ManyToManyField(blank=True, null=True, to=settings.AUTH_USER_MODEL),
+            model_name="coupons",
+            name="user",
+            field=models.ManyToManyField(
+                blank=True, null=True, to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

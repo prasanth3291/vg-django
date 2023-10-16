@@ -201,33 +201,31 @@
                                
                             <form action="{% url 'checkout' %}" method="post">
                                 {% csrf_token %}                                
-                                <div class="row">
+                                
                                     {% if discount_value %}
                                     <h6 class="text-white btn btn-success m-2" >Coupon {{valid_coupon.name}} applied</h6>
                                     {%else %}
                                     <h6 style="padding-left: 10px;">You have any coupons?</h6>
-                                    
-                                    <div class="col-9 p-2">
+                                    <div class="row-12 d-flex ">                                    
+                                    <div class="col-lg-9 col-sm-6 p-2">
                                         <input type="text" id="coupon_code" name="coupon_code" class="form-control" placeholder="Enter coupon code">
                                     </div>
-                                    <div class="col-3 p-2">
+                                    <div class="col-lg-3 col-sm-4 p-2">
                                         <button type="submit" class="btn btn-primary btn-block">Apply Coupon</button>
-                                    </div>  
+                                    </div> 
                                     
-                                    {% endif %}
-                                    {% if messages %}
-                                    {% for message in messages %}
-                                    {% if 'coupon' in message.tags %}
-
-                                        
-                                            <div class="address-error">
-                                                <p class="alert text-danger " style="font-size: large;font-weight: 900;font-family: 'Gill Sans', 'Gill Sans MT', Calibri,
-                                                'Trebuchet MS', sans-serif;">{{ message }}</p>
-                                            </div>
-                                            {% endif %} 
-                                    {% endfor %}
-                                {% endif %}                   
+                                    {% endif %}                                                  
                                 </div>
+                                {% if messages %}
+                                    {% for message in messages %}
+                                    {% if 'coupon' in message.tags %}                                        
+                                    <div class="address-error">
+                                        <p class="alert text-danger " style="font-size: large;font-weight: 900;font-family: 'Gill Sans', 'Gill Sans MT', Calibri,
+                                                'Trebuchet MS', sans-serif;">{{ message }}</p>
+                                    </div>
+                                    {% endif %} 
+                                    {% endfor %}
+                                {% endif %}     
 
                                                                    
                             </form>

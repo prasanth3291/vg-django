@@ -6,28 +6,57 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('acounts', '0017_reviewrating'),
+        ("acounts", "0017_reviewrating"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Wallet',
+            name="Wallet",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('balance', models.DecimalField(decimal_places=2, default=0, max_digits=10)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "balance",
+                    models.DecimalField(decimal_places=2, default=0, max_digits=10),
+                ),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Transaction',
+            name="Transaction",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('timestamp', models.DateTimeField(auto_now_add=True)),
-                ('description', models.CharField(blank=True, max_length=250)),
-                ('Wallet', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='acounts.wallet')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("amount", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("timestamp", models.DateTimeField(auto_now_add=True)),
+                ("description", models.CharField(blank=True, max_length=250)),
+                (
+                    "Wallet",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="acounts.wallet"
+                    ),
+                ),
             ],
         ),
     ]

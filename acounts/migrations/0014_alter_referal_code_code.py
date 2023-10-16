@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('acounts', '0013_acount_referal_code'),
+        ("acounts", "0013_acount_referal_code"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='referal_code',
-            name='code',
+            model_name="referal_code",
+            name="code",
             field=models.CharField(max_length=6),
         ),
     ]

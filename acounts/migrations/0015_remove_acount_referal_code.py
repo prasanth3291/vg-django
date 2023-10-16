@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('acounts', '0014_alter_referal_code_code'),
+        ("acounts", "0014_alter_referal_code_code"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='acount',
-            name='referal_code',
+            model_name="acount",
+            name="referal_code",
         ),
     ]

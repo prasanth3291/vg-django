@@ -1,17 +1,18 @@
 from django import forms
 
+
 class ProductFilterForm(forms.Form):
     CATEGORY_CHOICES = (
-        ('men', 'Men'),
-        ('women', 'Women'),
-        ('kids', 'Kids'),
+        ("men", "Men"),
+        ("women", "Women"),
+        ("kids", "Kids"),
     )
 
     SIZE_CHOICES = (
-        ('sm', 'SM'),
-        ('md', 'MD'),
-        ('lg', 'LG'),
-        ('xl', 'XL'),
+        ("sm", "SM"),
+        ("md", "MD"),
+        ("lg", "LG"),
+        ("xl", "XL"),
     )
 
     category = forms.MultipleChoiceField(

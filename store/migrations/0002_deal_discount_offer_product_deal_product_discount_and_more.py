@@ -5,52 +5,95 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('store', '0001_initial'),
+        ("store", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Deal',
+            name="Deal",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50)),
-                ('discount', models.PositiveIntegerField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50)),
+                ("discount", models.PositiveIntegerField()),
             ],
         ),
         migrations.CreateModel(
-            name='Discount',
+            name="Discount",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50)),
-                ('discount', models.PositiveIntegerField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50)),
+                ("discount", models.PositiveIntegerField()),
             ],
         ),
         migrations.CreateModel(
-            name='Offer',
+            name="Offer",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50)),
-                ('description', models.TextField()),
-                ('start_date', models.DateField()),
-                ('end_date', models.DateField()),
-                ('discount', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='store.discount')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50)),
+                ("description", models.TextField()),
+                ("start_date", models.DateField()),
+                ("end_date", models.DateField()),
+                (
+                    "discount",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="store.discount"
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='product',
-            name='deal',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='store.deal'),
+            model_name="product",
+            name="deal",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="store.deal",
+            ),
         ),
         migrations.AddField(
-            model_name='product',
-            name='discount',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='store.discount'),
+            model_name="product",
+            name="discount",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="store.discount",
+            ),
         ),
         migrations.AddField(
-            model_name='product',
-            name='offer',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='store.offer'),
+            model_name="product",
+            name="offer",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="store.offer",
+            ),
         ),
     ]

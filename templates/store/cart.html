@@ -11,6 +11,7 @@
             </div>
         {% else %}    
     <!-- ============================ COMPONENT 1 ================================= -->    
+
     <div class="row">
         <aside class="col-lg-9">
             <div class="card">
@@ -70,7 +71,7 @@
                                     <small class="text-muted">$ {{cart_item.variations.price}} each </small> 
                                 </div> <!-- price-wrap .// -->
                              </td>
-                             <td class="text-right"> 
+                             <td class="text-right d-none d-lg-flex d-md-flex"> 
                                 <a href="{% url 'remove_cart_item' cart_item.product.id  cart_item.id %}" onclick="return confirm('Ares you sure you want delete this item')" class="btn btn-danger"> Remove</a>
                              </td>
                         </tr>

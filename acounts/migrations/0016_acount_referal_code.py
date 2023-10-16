@@ -5,15 +5,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('acounts', '0015_remove_acount_referal_code'),
+        ("acounts", "0015_remove_acount_referal_code"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='acount',
-            name='Referal_code',
-            field=models.CharField(default=acounts.models.generate_unique_referral_code, max_length=6, unique=True),
+            model_name="acount",
+            name="Referal_code",
+            field=models.CharField(
+                default=acounts.models.generate_unique_referral_code,
+                max_length=6,
+                unique=True,
+            ),
         ),
     ]

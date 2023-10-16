@@ -7,31 +7,61 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('acounts', '0011_remove_wishlist_quantity_alter_wishlist_products'),
+        ("acounts", "0011_remove_wishlist_quantity_alter_wishlist_products"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='acount',
-            name='wallet_money',
+            model_name="acount",
+            name="wallet_money",
             field=models.IntegerField(default=0),
         ),
         migrations.AlterField(
-            model_name='wishlist',
-            name='added_at',
+            model_name="wishlist",
+            name="added_at",
             field=models.DateField(auto_now_add=True),
         ),
         migrations.CreateModel(
-            name='Referal_code',
+            name="Referal_code",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('code', models.CharField(default=acounts.models.generate_unique_referral_code, max_length=6, unique=True)),
-                ('gift_money', models.IntegerField()),
-                ('is_activated', models.BooleanField(default=False)),
-                ('referred_user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='referral_code_received', to=settings.AUTH_USER_MODEL)),
-                ('referrer_user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='referral_code_given', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "code",
+                    models.CharField(
+                        default=acounts.models.generate_unique_referral_code,
+                        max_length=6,
+                        unique=True,
+                    ),
+                ),
+                ("gift_money", models.IntegerField()),
+                ("is_activated", models.BooleanField(default=False)),
+                (
+                    "referred_user",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="referral_code_received",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "referrer_user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="referral_code_given",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

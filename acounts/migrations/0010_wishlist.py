@@ -6,22 +6,48 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('store', '0003_variation_offer_price'),
-        ('acounts', '0009_rename_maxium_discount_coupons_maximum_discount_and_more'),
+        ("store", "0003_variation_offer_price"),
+        ("acounts", "0009_rename_maxium_discount_coupons_maximum_discount_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Wishlist',
+            name="Wishlist",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('quantity', models.PositiveIntegerField()),
-                ('added_at', models.DateField()),
-                ('products', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, to='store.product')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('variation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='store.variation')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("quantity", models.PositiveIntegerField()),
+                ("added_at", models.DateField()),
+                (
+                    "products",
+                    models.ForeignKey(
+                        blank=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="store.product",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "variation",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="store.variation",
+                    ),
+                ),
             ],
         ),
     ]

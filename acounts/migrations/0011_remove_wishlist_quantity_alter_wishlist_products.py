@@ -5,20 +5,21 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('store', '0003_variation_offer_price'),
-        ('acounts', '0010_wishlist'),
+        ("store", "0003_variation_offer_price"),
+        ("acounts", "0010_wishlist"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='wishlist',
-            name='quantity',
+            model_name="wishlist",
+            name="quantity",
         ),
         migrations.AlterField(
-            model_name='wishlist',
-            name='products',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='store.product'),
+            model_name="wishlist",
+            name="products",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="store.product"
+            ),
         ),
     ]

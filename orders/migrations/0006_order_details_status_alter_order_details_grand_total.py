@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('orders', '0005_order_details'),
+        ("orders", "0005_order_details"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='order_details',
-            name='status',
+            model_name="order_details",
+            name="status",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='order_details',
-            name='grand_total',
+            model_name="order_details",
+            name="grand_total",
             field=models.FloatField(),
         ),
     ]

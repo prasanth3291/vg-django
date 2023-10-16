@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('acounts', '0002_coupons'),
+        ("acounts", "0002_coupons"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='coupons',
-            name='user',
+            model_name="coupons",
+            name="user",
         ),
     ]

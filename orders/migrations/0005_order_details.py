@@ -5,23 +5,35 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('orders', '0004_order_discount_order_offers'),
+        ("orders", "0004_order_discount_order_offers"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='order_details',
+            name="order_details",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('original_total', models.FloatField()),
-                ('discount_from_coupons', models.FloatField(blank=True)),
-                ('discount_from_offers', models.FloatField(blank=True)),
-                ('sub_total', models.FloatField()),
-                ('tax', models.FloatField()),
-                ('grand_total', models.FloatField(verbose_name='')),
-                ('order', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='orders.order')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("original_total", models.FloatField()),
+                ("discount_from_coupons", models.FloatField(blank=True)),
+                ("discount_from_offers", models.FloatField(blank=True)),
+                ("sub_total", models.FloatField()),
+                ("tax", models.FloatField()),
+                ("grand_total", models.FloatField(verbose_name="")),
+                (
+                    "order",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE, to="orders.order"
+                    ),
+                ),
             ],
         ),
     ]

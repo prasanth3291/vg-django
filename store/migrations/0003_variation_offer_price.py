@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('store', '0002_deal_discount_offer_product_deal_product_discount_and_more'),
+        ("store", "0002_deal_discount_offer_product_deal_product_discount_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='variation',
-            name='offer_price',
+            model_name="variation",
+            name="offer_price",
             field=models.FloatField(blank=True, null=True),
         ),
     ]

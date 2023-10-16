@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('acounts', '0007_remove_coupons_user_coupons_maxium_discount_and_more'),
+        ("acounts", "0007_remove_coupons_user_coupons_maxium_discount_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='coupons',
-            name='coupon_count',
+            model_name="coupons",
+            name="coupon_count",
             field=models.IntegerField(default=0),
             preserve_default=False,
         ),

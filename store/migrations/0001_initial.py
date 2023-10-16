@@ -6,64 +6,129 @@ import django.db.models.manager
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('category', '0001_initial'),
+        ("category", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Color',
+            name="Color",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('color_name', models.CharField(max_length=50)),
-                ('color_code', models.IntegerField()),
-                ('is_availabale', models.BooleanField(default=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("color_name", models.CharField(max_length=50)),
+                ("color_code", models.IntegerField()),
+                ("is_availabale", models.BooleanField(default=True)),
             ],
         ),
         migrations.CreateModel(
-            name='Product',
+            name="Product",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_deleted', models.BooleanField(default=False)),
-                ('product_name', models.CharField(max_length=100, unique=True)),
-                ('slug', models.SlugField(max_length=200, unique=True)),
-                ('description', models.TextField()),
-                ('images', models.ImageField(upload_to='pics/product')),
-                ('is_available', models.BooleanField(default=True)),
-                ('created_date', models.DateTimeField(auto_now_add=True)),
-                ('modified_date', models.DateTimeField(auto_now=True)),
-                ('category', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='category.category')),
-                ('subcategory', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='category.sub_category')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("is_deleted", models.BooleanField(default=False)),
+                ("product_name", models.CharField(max_length=100, unique=True)),
+                ("slug", models.SlugField(max_length=200, unique=True)),
+                ("description", models.TextField()),
+                ("images", models.ImageField(upload_to="pics/product")),
+                ("is_available", models.BooleanField(default=True)),
+                ("created_date", models.DateTimeField(auto_now_add=True)),
+                ("modified_date", models.DateTimeField(auto_now=True)),
+                (
+                    "category",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="category.category",
+                    ),
+                ),
+                (
+                    "subcategory",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="category.sub_category",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
             managers=[
-                ('everything', django.db.models.manager.Manager()),
+                ("everything", django.db.models.manager.Manager()),
             ],
         ),
         migrations.CreateModel(
-            name='Size',
+            name="Size",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('size', models.CharField(max_length=50)),
-                ('is_availabale', models.BooleanField(default=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("size", models.CharField(max_length=50)),
+                ("is_availabale", models.BooleanField(default=True)),
             ],
         ),
         migrations.CreateModel(
-            name='Variation',
+            name="Variation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('price', models.IntegerField(default=0)),
-                ('stock', models.IntegerField(default=0)),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_date', models.DateField(auto_now_add=True)),
-                ('color', models.ForeignKey(default='', on_delete=django.db.models.deletion.CASCADE, to='store.color')),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='store.product')),
-                ('size', models.ForeignKey(default='', on_delete=django.db.models.deletion.CASCADE, to='store.size')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("price", models.IntegerField(default=0)),
+                ("stock", models.IntegerField(default=0)),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_date", models.DateField(auto_now_add=True)),
+                (
+                    "color",
+                    models.ForeignKey(
+                        default="",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="store.color",
+                    ),
+                ),
+                (
+                    "product",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="store.product"
+                    ),
+                ),
+                (
+                    "size",
+                    models.ForeignKey(
+                        default="",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="store.size",
+                    ),
+                ),
             ],
         ),
     ]
